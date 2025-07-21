@@ -1,3 +1,8 @@
+'use client'
+
+// next
+import { useRouter } from "next/navigation";
+
 // components
 import { Button } from "@/components/ui/button";
 import InfoCard from "@/components/Index/InfoCard";
@@ -29,6 +34,8 @@ const mockInfo = [
 ]
 
 export default function Home() {
+  const router = useRouter()
+
   return (
     <div className="font-sans items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 flex">
       <main className="flex flex-col items-center w-full max-w-[1600px]">
@@ -44,7 +51,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap items-center w-full md:w-fit py-4">
-            <Button className="md:px-[32px]">Get Started</Button>
+            <Button className="md:px-[32px]" onClick={() => router.push('/auth')}>Get Started</Button>
           </div>
 
           <div className="flex justify-center items-center w-full">
