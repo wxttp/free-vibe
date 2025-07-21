@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { Library, ListMusic, HeartPlus, Upload, Settings } from 'lucide-react';
+import { Library, ListMusic, HeartPlus, Upload, Settings, Music } from 'lucide-react';
 
 const items = [
   {
@@ -34,7 +34,7 @@ const items = [
   },
   {
     title: "Upload Music",
-    url: "/home/upload",
+    url: "/home/upload-music",
     icon: Upload,
   },
   {
@@ -50,7 +50,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>FreeVibe</SidebarHeader>
+      <SidebarHeader className={'mt-2 flex flex-row justify-center items-center'}><Music />FreeVibe</SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
