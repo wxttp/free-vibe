@@ -44,6 +44,8 @@
 }
 
 :root {
+  --primary-color: #7A3CDD;
+  --primary-color-hover: #6f35cc;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
