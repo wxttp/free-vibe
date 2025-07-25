@@ -38,7 +38,7 @@ export function AppTopbar() {
             />
         </div>
 
-        <div className='flex gap-2 cursor-pointer'>
+        <div className='flex gap-2 cursor-pointer mr-5'>
             <CircleUserRound />
             Profile
         </div>

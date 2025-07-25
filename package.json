@@ -1,7 +1,11 @@
 {
   "name": "free-vibe",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
