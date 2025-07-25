@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 const CardAuth = () => {
+  // State
   const [register, setRegister] = useState({
     name: "",
     email: "",
@@ -26,19 +27,23 @@ const CardAuth = () => {
   const [login, setLogin] = useState({ email: "", password: "" });
   const router = useRouter();
 
+  // Handler for register input change
   const handleRegisterChange = (e) => {
     setRegister({ ...register, [e.target.name]: e.target.value });
   };
-
+  // Handler for login input change
   const handleLoginChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
-
+  // Handler for register form submit
   const handleRegister = async (e) => {
     e.preventDefault();
-
+    if (register.password.length < 8) {
+      toast.error("Password must be at least 8 characters long!");
+      return;
+    }
     if (register.password != register.confirmPassword) {
-      toast.error("password not same!");
+      toast.error("Passwords do not match!");
       return;
     }
     const res = await fetch("/api/auth/register", {
@@ -56,16 +61,19 @@ const CardAuth = () => {
         const result = await signIn("credentials", {
           email: register.email,
           password: register.password,
+          confirmPassword: register.confirmPassword,
           redirect: false,
         });
         if (result.error) {
-          console.log(result.error);
+          toast.error(result.error);
         } else {
           router.push("/home/library");
         }
       } catch (error) {
         console.log(error);
       }
+    } else {
+      toast.error(data.error);
     }
   };
 
@@ -78,7 +86,7 @@ const CardAuth = () => {
         redirect: false,
       });
       if (result.error) {
-        console.error(result.error);
+        toast.error(result.error);
       } else {
         toast.success("Login successfull!");
         router.push("/home/library");
@@ -133,6 +141,7 @@ const CardAuth = () => {
                   id="password"
                   name="password"
                   type="password"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                   value={login.password}
                   onChange={handleLoginChange}
                   placeholder="Enter your password"
@@ -167,6 +176,7 @@ const CardAuth = () => {
                   id="password"
                   type="password"
                   name="password"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                   value={register.password}
                   onChange={handleRegisterChange}
                   placeholder="Enter your password"
@@ -181,6 +191,7 @@ const CardAuth = () => {
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                   value={register.confirmPassword}
                   onChange={handleRegisterChange}
                   placeholder="Enter your confirm password"
