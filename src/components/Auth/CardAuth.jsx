@@ -61,7 +61,7 @@ const CardAuth = () => {
         if (result.error) {
           console.log(result.error);
         } else {
-          router.push("/Test");
+          router.push("/home/library");
         }
       } catch (error) {
         console.log(error);
@@ -81,7 +81,7 @@ const CardAuth = () => {
         console.error(result.error);
       } else {
         toast.success("Login successfull!");
-        router.push("/Test");
+        router.push("/home/library");
       }
     } catch (error) {
       console.log("error", error);
