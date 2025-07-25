@@ -2,16 +2,6 @@ import { PrismaClient } from "../src/generated/prisma/client.js";
 const prisma = new PrismaClient()
 
 async function main() {
-  const bob = await prisma.user.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1,
-      email: 'Bob@gmail.com',
-      password: '123456',
-      name: null,
-    },
-  })
 
   const song = await prisma.song.upsert({
     where: { id: 1 },
@@ -22,8 +12,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 3 } },
     },
   })
 
@@ -36,10 +25,10 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 3 } },
     },
   })
+
   const song3 = await prisma.song.upsert({
     where: { id: 3 },
     update: {},
@@ -49,8 +38,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
 
@@ -63,8 +51,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
   const song5 = await prisma.song.upsert({
@@ -76,8 +63,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 3 } },
     },
   })
 
@@ -90,8 +76,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
   const song7 = await prisma.song.upsert({
@@ -103,8 +88,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
 
@@ -117,8 +101,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
   const song9 = await prisma.song.upsert({
@@ -130,8 +113,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
 
@@ -144,8 +126,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
   const song11 = await prisma.song.upsert({
@@ -157,8 +138,7 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
 
@@ -171,12 +151,11 @@ async function main() {
       file: null,
       url: null,
       isUrl: false,
-    //   users_id: bob.id,
-      user: { connect: { id: bob.id } },
+      user: { connect: { id: 2 } },
     },
   })
 
-  console.log({ bob, song, song2, song3, song4, song5, song6, song7, song8, song9, song10, song11, song12 })
+  console.log({ song, song2, song3, song4, song5, song6, song7, song8, song9, song10, song11, song12 })
 }
 main()
   .then(async () => {

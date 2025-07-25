@@ -1,9 +1,13 @@
 import React from 'react'
 import { getAllSongs } from "@/lib/library/song.js";
 import MusicCard from '@/components/Dashboard/MusicCard';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 
 const page = async () => {
-  const songs = await getAllSongs()
+  const session = await getServerSession(authOptions);
+  const songs = await getAllSongs(session);
   const total = songs.length
 
   return (
