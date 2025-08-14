@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { Library, ListMusic, HeartPlus, Upload, Settings, Music } from 'lucide-react';
+import { Library, ListMusic, HeartPlus, Upload, ChartPie, Settings, Music } from 'lucide-react';
 
 const items = [
   {
@@ -36,6 +36,11 @@ const items = [
     title: "Upload Music",
     url: "/home/upload-music",
     icon: Upload,
+  },
+  {
+    title: "Statistics",
+    url: "/home/statistics",
+    icon: ChartPie,
   },
   {
     title: "Settings",
