@@ -1,6 +1,6 @@
 import React from 'react'
 import { getAllSongs } from "@/lib/library/song.js";
-import MusicCard from '@/components/Dashboard/MusicCard';
+import MusicCard from '@/components/home/MusicCard';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
