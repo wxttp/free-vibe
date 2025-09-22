@@ -17,14 +17,36 @@ datasource db {
 model User {
   id         Int       @id @default(autoincrement())
   email      String    @unique
-  password   String
+  password   String?
   name       String?
   created_at  DateTime @default(now())
 
   songs      Song[]
   playlists  Playlist[]
   favorites  Favorite[]
+  accounts   Account[]
+  emailVerified DateTime?
 }
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
 
 model Song {
   id         Int       @id @default(autoincrement())
