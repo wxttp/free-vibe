@@ -1,12 +1,49 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
+import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from "sonner";
 
 import { Link } from 'lucide-react';
+import { fetchYouTubeMeta } from '@/lib/youtube';
 
 function UrlUploaderCard() {
+  const router = useRouter();
+
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const onAdd = async () => {
+    console.log('hit add');
+    console.log(url);
+    if (!url)
+      return;
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/upload-music', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, userId: 4 }),
+      })
+
+      const data = await res.json();
+      if (!res.ok)
+        toast.error(data.error || 'Failed to add');
+      else
+        toast.success('Add successfull!');
+        setUrl('');
+        router.push("/home/library");
+    } catch {
+        toast.error('Network error');
+    } finally {
+        setLoading(false);
+    }
+  }
+
   return (
     <>
       <Card className={'hover:shadow-sm! max-h-[500] h-[calc(500px-112px)] sm:h-[calc(250px)]'}>
@@ -21,11 +58,17 @@ function UrlUploaderCard() {
           <div className='flex flex-col justify-between h-full'>
             <div>
               <label className='' htmlFor="url">YouTube URL</label>
-              <Input type="url" id="url" placeholder="https://www.youtube.com/watch?v=..." />
+              <Input
+                type="url"
+                id="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
             </div>
             
             <div>
-              <Button>Add</Button>
+              <Button onClick={onAdd} disabled={loading}>{loading ? 'Adding...' : 'Add'}</Button>
             </div>
           </div>
         </CardContent>
