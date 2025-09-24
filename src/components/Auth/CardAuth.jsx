@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,10 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Music } from "lucide-react";
-import { toast } from "sonner";
-
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import RegisterTabs from "@/components/Auth/AuthTabs/RegisterTabs";
+import LoginTabs from "@/components/Auth/AuthTabs/LoginTabs";
 
 const CardAuth = () => {
   // State
@@ -25,75 +21,14 @@ const CardAuth = () => {
     confirmPassword: "",
   });
   const [login, setLogin] = useState({ email: "", password: "" });
-  const router = useRouter();
 
-  // Handler for register input change
-  const handleRegisterChange = (e) => {
-    setRegister({ ...register, [e.target.name]: e.target.value });
-  };
   // Handler for login input change
   const handleLoginChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
-  // Handler for register form submit
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (register.password.length < 8) {
-      toast.error("Password must be at least 8 characters long!");
-      return;
-    }
-    if (register.password != register.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(register),
-    });
-    const data = await res.json();
-    if (data.status === 200) {
-      setRegister({ name: "", email: "", password: "", confirmPassword: "" });
-      toast.success("Registeration successfull!");
-      try {
-        const result = await signIn("credentials", {
-          email: register.email,
-          password: register.password,
-          confirmPassword: register.confirmPassword,
-          redirect: false,
-        });
-        if (result.error) {
-          toast.error(result.error);
-        } else {
-          router.push("/home/library");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      toast.error(data.error);
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const result = await signIn("credentials", {
-        email: login.email,
-        password: login.password,
-        redirect: false,
-      });
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Login successfull!");
-        router.push("/home/library");
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
+  // Handler for register input change
+  const handleRegisterChange = (e) => {
+    setRegister({ ...register, [e.target.name]: e.target.value });
   };
 
   return (
@@ -117,90 +52,16 @@ const CardAuth = () => {
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
-          <TabsContent value="login" className="">
-            <form action="" onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="font-bold">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={login.email}
-                  onChange={handleLoginChange}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="font-bold">
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                  value={login.password}
-                  onChange={handleLoginChange}
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-
-              <Button className="w-full">Login</Button>
-            </form>
-          </TabsContent>
-          <TabsContent value="register" className="">
-            <form action="" onSubmit={handleRegister} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="font-bold">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={register.email}
-                  onChange={handleRegisterChange}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="font-bold">
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                  value={register.password}
-                  onChange={handleRegisterChange}
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="font-bold">
-                  Confirm Password
-                </label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                  value={register.confirmPassword}
-                  onChange={handleRegisterChange}
-                  placeholder="Enter your confirm password"
-                  required
-                />
-              </div>
-              <Button className="w-full">Register</Button>
-            </form>
-          </TabsContent>
+          <LoginTabs
+            handleLoginChange={handleLoginChange}
+            login={login}
+            setLogin={setLogin}
+          />
+          <RegisterTabs
+            handleRegisterChange={handleRegisterChange}
+            register={register}
+            setRegister={setRegister}
+          />
         </Tabs>
       </CardContent>
     </Card>

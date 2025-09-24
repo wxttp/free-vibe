@@ -5,6 +5,8 @@ import { PrismaClient } from "@/generated/prisma";
 import bcrypt from "bcrypt";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { adapter } from "next/dist/server/web/adapter";
+import googleProvider from "next-auth/providers/google";
+import { redirect } from "next/dist/server/api-utils";
 
 const prisma = new PrismaClient();
 
@@ -41,6 +43,17 @@ export const authOptions = {
         } else {
           throw new Error("Invalid Email or Password");
         }
+      },
+    }),
+    googleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+        };
       },
     }),
   ],
