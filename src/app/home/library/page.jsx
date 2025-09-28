@@ -8,7 +8,12 @@ import LibraryPage from '@/components/home/library/LibraryPage';
 
 const page = async () => {
   const session = await getServerSession(authOptions);
-  const songs = await getAllSongs(session);
+  const userId = session?.user?.id;
+  if (!userId)
+    // TODO: ให้ redirect ไปที่หน้า home
+    return
+
+  const songs = await getAllSongs(userId);
 
   return (
     <LibraryPage songs={songs} />

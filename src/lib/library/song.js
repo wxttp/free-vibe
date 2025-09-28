@@ -1,13 +1,18 @@
 import prisma from "@/lib/prisma"
 
-export async function getAllSongs(session) {
-  const userId = session?.user?.id;
+export async function getAllSongs(userId) {
+  if (!userId)
+    return
 
-  return await prisma.song.findMany(
-    {
-      where: {
-        users_id: userId
-      }
-    }
-  )
+  return prisma.song.findMany({
+    where: { users_id: userId },
+    select: {
+      id: true,
+      title: true,
+      artist: true,
+      isUrl: true,
+      url: true,
+      time: true,
+    },
+  })
 }
