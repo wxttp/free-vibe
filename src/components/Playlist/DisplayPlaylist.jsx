@@ -4,6 +4,7 @@ import { CreatePlaylist } from "@/components/Playlist/CreatePlaylist";
 import PlaylistCard from "@/components/Playlist/PlaylistCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import OptionCard from "@/components/Playlist/OptionCard";
 
 const DisplayPlaylist = ({ session, playlists }) => {
   const [open, setOpen] = useState(false);
@@ -15,7 +16,6 @@ const DisplayPlaylist = ({ session, playlists }) => {
         open={open}
         onClose={() => setOpen(false)}
         session={session}
-        // ref={ref}
       />
       <div className="">
         <div className="text-3xl items-center grid grid-cols-2 mb-5">

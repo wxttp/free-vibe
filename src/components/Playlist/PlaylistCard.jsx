@@ -3,6 +3,7 @@ import React from "react";
 import { ListMusic, EllipsisVertical, Play } from "lucide-react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import OptionCard from "./OptionCard";
 
 const PlaylistCard = (props) => {
   const sec = props.playlist.playlistTime % 60;
@@ -23,8 +24,8 @@ const PlaylistCard = (props) => {
             <ListMusic className="h-8 w-8 text-music-primary" />
           </div>
         </div>
-        <div className="flex flex-col space-y-3">
-          <CardTitle className="font-extrabold">
+        <div className="flex flex-col space-y-2">
+          <CardTitle className="font-extrabold text-lg">
             {props.playlist.name}
           </CardTitle>
           <CardDescription className="font-medium">
@@ -46,11 +47,11 @@ const PlaylistCard = (props) => {
       <div className="flex flex-wrap"></div>
       <div className="flex flex-row items-center gap-2">
         <Button className="gap-2 w-fit h-fit">
-          <Play /> 
+          <Play />
           Play
         </Button>
-        <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer flex items-center">
-          <EllipsisVertical />
+        <div className="w-[44px] h-[44px] hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer flex items-center">
+          <OptionCard />
         </div>
       </div>
     </Card>

@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 export async function POST(req) {
     try{
         const { name, description, users_id } = await req.json();
-        console.log(name, description, users_id);
         const playlist = await prisma.playlist.create({
             data:{
                 name,
