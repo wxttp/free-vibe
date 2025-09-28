@@ -6,8 +6,8 @@ import { extractYouTubeId } from '@/lib/youtube'
 
 const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
   const [type, setType] = useState('Loading...')
-  const [loading, setLoading] = useState(false)
   const [showYT, setShowYT] = useState(false)
+  const audioRef = useRef(null);
 
   const isUrl = !!song?.isUrl
   const youTubeId = isUrl ? extractYouTubeId(song?.url ?? '') : null
@@ -22,16 +22,8 @@ const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
     if (!song)
       return
 
-    setLoading(true)
-
     const t = setTimeout(() => {
-      if (song.isUrl)
-        setType('Url')
-      else if (song.file)
-        setType('File')
-      else
-        setType('Undefined')
-      setLoading(false)
+      setType(song.isUrl ? 'Url' : 'File')
     }, 300)
 
     return () => clearTimeout(t)
@@ -39,9 +31,32 @@ const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
 
   // ยัดใส่ iframe ให้เล่นเสียง
   useEffect(() => {
-    if (isUrl)
+    if (isUrl) {
       setShowYT(isActive)
-  }, [isActive, isUrl])
+      return
+    }
+
+    const el = audioRef.current
+    if (!el)
+      return
+
+    // รีโหลด src ทุกครั้งที่เพลงเปลี่ยน
+    el.load()
+
+    if (isActive) {
+      if (el.readyState >= 3)
+        el.play().catch(() => {})
+      else
+        el.addEventListener("canplay", () => el.play().catch(() => {}), { once: true })
+    } else {
+      el.pause()
+    }
+  }, [isActive, isUrl, song.id])
+
+  // เพิ่ม handler ช่วย debug
+  const onAudioError = (e) => {
+    console.error('Audio error', e?.currentTarget?.error)
+  }
 
   return (
     <>
@@ -62,7 +77,7 @@ const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
             <CardDescription>{song?.artist}</CardDescription>
             <div className="flex space-x-5">
               <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
-                {loading ? 'Loading...' : type}
+                {type}
               </div>
               <div className="font-medium">
                 Duration: {isUrl ? '-' : ''}
@@ -95,6 +110,18 @@ const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
             tabIndex={-1}
           />
         </div>
+      )}
+
+      {!isUrl && (
+        <audio
+          ref={audioRef}
+          src={`/api/song/${song.id}/stream`}
+          controls
+          preload="none"
+          onEnded={deactivate}
+          onError={onAudioError}
+          className="hidden"
+        />
       )}
     </>
   )
