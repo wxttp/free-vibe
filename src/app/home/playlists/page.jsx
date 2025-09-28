@@ -1,18 +1,19 @@
-import React from 'react'
 
-const PlaylistsPage = () => {
+import React from "react";
+import { getAllPlaylists } from "@/lib/playlist/playlist";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import DisplayPlaylist from "@/components/Playlist/DisplayPlaylist";
+
+const PlaylistsPage = async () => {
+  const session = await getServerSession(authOptions);
+  const playlists = await getAllPlaylists(session);
+  
   return (
-    <main className='mt-5'>
-      <div className='text-3xl flex flex-col mb-5'>
-        <span className='text-[var(--primary-color)] font-bold'>Playlists</span>
-        <span className='text-sm opacity-70'> playlists</span>
-      </div>
-
-      <div className='flex flex-col gap-5 w-full mb-5'>
-        
-      </div>
+    <main className="flex flex-col mt-5 w-full min-h-screen">
+      <DisplayPlaylist session={session} playlists={playlists} />
     </main>
-  )
-}
+  );
+};
 
-export default PlaylistsPage
+export default PlaylistsPage;
