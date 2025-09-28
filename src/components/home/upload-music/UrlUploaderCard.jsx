@@ -8,17 +8,16 @@ import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
 
 import { Link } from 'lucide-react';
-import { fetchYouTubeMeta } from '@/lib/youtube';
 
-function UrlUploaderCard() {
+function UrlUploaderCard(props) {
+  const { userId } = props;
+
   const router = useRouter();
 
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
   const onAdd = async () => {
-    console.log('hit add');
-    console.log(url);
     if (!url)
       return;
     setLoading(true);
@@ -27,7 +26,7 @@ function UrlUploaderCard() {
       const res = await fetch('/api/upload-music', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, userId: 4 }),
+        body: JSON.stringify({ url, userId }),
       })
 
       const data = await res.json();

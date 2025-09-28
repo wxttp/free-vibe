@@ -3,7 +3,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUploaderCard from '@/components/home/upload-music/FileUploaderCard';
 import UrlUploaderCard from '@/components/home/upload-music/UrlUploaderCard';
 
-const UploadMusicPage = () => {
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+const UploadMusicPage = async () => {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId)
+    return
+
   return (
     <main className='mt-5'>
       <div className='text-3xl flex flex-col mb-5'>
@@ -20,10 +28,10 @@ const UploadMusicPage = () => {
           </TabsList>
 
           <TabsContent value="file">
-            <FileUploaderCard />
+            <FileUploaderCard userId={userId} />
           </TabsContent>
           <TabsContent value="url">
-            <UrlUploaderCard />
+            <UrlUploaderCard userId={userId} />
           </TabsContent>
 
         </Tabs>
