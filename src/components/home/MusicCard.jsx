@@ -1,129 +1,90 @@
 'use client'
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
 import { HeartPlus, Play, Pause, EllipsisVertical } from 'lucide-react'
-import { extractYouTubeId } from '@/lib/youtube'
+import { usePlayer } from '@/stores/usePlayer'
 
-const MusicCard = ({ song, isActive, activate, deactivate, onEnded }) => {
+function fmt(s = 0) {
+  const t = Number.isFinite(s) ? s : 0
+  const m = Math.floor(t / 60)
+  const ss = Math.floor(t % 60).toString().padStart(2, '0')
+  return `${m}:${ss}`
+}
+
+const MusicCard = ({ song }) => {
   const [type, setType] = useState('Loading...')
-  const [showYT, setShowYT] = useState(false)
-  const audioRef = useRef(null);
 
-  const isUrl = !!song?.isUrl
-  const youTubeId = isUrl ? extractYouTubeId(song?.url ?? '') : null
-  const youTubeEmbed = youTubeId
-    ? `https://www.youtube.com/embed/${youTubeId}?autoplay=1&modestbranding=1&controls=0&fs=0&rel=0&iv_load_policy=3&playsinline=1`
-    : null
+  // ---- Zustand selectors (แยกเป็นตัว ๆ ลด re-render) ----
+  const current   = usePlayer(s => s.current)
+  const isPlaying = usePlayer(s => s.isPlaying)
+  const play      = usePlayer(s => s.play)
+  const pause     = usePlayer(s => s.pause)
+  const setCurrent= usePlayer(s => s.setCurrent)     // << ต้องมีใน usePlayer
+  const duration  = usePlayer(s => s.duration)
 
-  const togglePlay = () => (isActive ? deactivate() : activate())
+  const isActive = !!current && current.id === song?.id
+  const isUrl    = !!song?.isUrl
 
-  // แสดงประเภทของเพลง (.mp3 หรือ url)
   useEffect(() => {
-    if (!song)
-      return
-
+    if (!song) return
     const t = setTimeout(() => {
-      setType(song.isUrl ? 'Url' : 'File')
+      setType(isUrl ? 'Url' : 'File')
     }, 300)
-
     return () => clearTimeout(t)
-  }, [song])
+  }, [song, isUrl])
 
-  // ยัดใส่ iframe ให้เล่นเสียง
-  useEffect(() => {
-    if (isUrl) {
-      setShowYT(isActive)
-      return
-    }
-
-    const el = audioRef.current
-    if (!el)
-      return
-
-    // รีโหลด src ทุกครั้งที่เพลงเปลี่ยน
-    el.load()
-
+  const onTogglePlay = () => {
+    if (!song) return
     if (isActive) {
-      if (el.readyState >= 3)
-        el.play().catch(() => {})
-      else
-        el.addEventListener("canplay", () => el.play().catch(() => {}), { once: true })
+      // เพลงเดียวกัน → toggle play/pause
+      isPlaying ? pause() : play()
     } else {
-      el.pause()
+      // เพลงใหม่ → ตั้ง current แล้วเล่น
+      setCurrent?.(song)
+      play()
     }
-  }, [isActive, isUrl, song.id])
-
-  // เพิ่ม handler ช่วย debug
-  const onAudioError = (e) => {
-    console.error('Audio error', e?.currentTarget?.error)
   }
 
   return (
-    <>
-      <Card className="relative flex flex-row justify-between items-center min-h-fit p-5">
-        <div className="flex flex-row justify-between items-center gap-5">
-          <div className="flex items-center justify-center">
-            <button
-              onClick={togglePlay}
-              className="bg-[var(--primary-color)] rounded-full p-5 text-white hover:bg-[var(--primary-color-hover)] transition-all duration-300"
-              aria-label={isActive ? 'Pause' : 'Play'}
-            >
-              {isActive ? <Pause /> : <Play />}
-            </button>
-          </div>
+    <Card className="relative flex flex-row justify-between items-center min-h-fit p-5">
+      <div className="flex flex-row justify-between items-center gap-5">
+        <div className="flex items-center justify-center">
+          <button
+            onClick={onTogglePlay}
+            className="bg-[var(--primary-color)] rounded-full p-5 text-white hover:bg-[var(--primary-color-hover)] transition-all duration-300"
+            aria-label={isActive && isPlaying ? 'Pause' : 'Play'}
+          >
+            {isActive && isPlaying ? <Pause /> : <Play />}
+          </button>
+        </div>
 
-          <div className="flex flex-col space-y-3">
-            <CardTitle className="font-extrabold">{song?.title}</CardTitle>
-            <CardDescription>{song?.artist}</CardDescription>
-            <div className="flex space-x-5">
-              <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
-                {type}
-              </div>
-              <div className="font-medium">
-                Duration: {isUrl ? '-' : ''}
-              </div>
+        <div className="flex flex-col space-y-3">
+          <CardTitle className="font-extrabold">
+            {song?.title ?? 'Untitled'}
+          </CardTitle>
+          <CardDescription>{song?.artist ?? ''}</CardDescription>
+
+          <div className="flex space-x-5">
+            <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
+              {type}
+            </div>
+            <div className="font-medium">
+              {/* แสดง duration เฉพาะเมื่อเป็นเพลงที่ active (อ่านจาก store) */}
+              Duration: {isActive ? fmt(duration) : (isUrl ? '-' : '-')}
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-wrap">
-          <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-            <HeartPlus />
-          </div>
-          <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-            <EllipsisVertical />
-          </div>
+      <div className="flex flex-wrap">
+        <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+          <HeartPlus />
         </div>
-      </Card>
-
-      {isUrl && showYT && youTubeEmbed && (
-        <div
-          className="hidden absolute top-0 left-0 w-[1px] h-[1px] opacity-0 pointer-events-none"
-          aria-hidden="true"
-        >
-          <iframe
-            src={youTubeEmbed}
-            title={song?.title || 'YouTube'}
-            width="1"
-            height="1"
-            allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
-            tabIndex={-1}
-          />
+        <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+          <EllipsisVertical />
         </div>
-      )}
-
-      {!isUrl && (
-        <audio
-          ref={audioRef}
-          src={`/api/song/${song.id}/stream`}
-          controls
-          preload="none"
-          onEnded={deactivate}
-          onError={onAudioError}
-          className="hidden"
-        />
-      )}
-    </>
+      </div>
+    </Card>
   )
 }
 

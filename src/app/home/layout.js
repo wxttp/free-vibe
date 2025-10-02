@@ -2,10 +2,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 // import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import { AppTopbar } from "@/components/AppTopbar";
-import { AppFooter } from "@/components/AppFooter"
-;
+import { AppSidebar } from "@/components/home/sidebar/AppSidebar";
+import { AppTopbar } from "@/components/home/topbar/AppTopbar";
+import { AppFooter } from "@/components/home/footer/AppFooter";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getAllSongs } from "@/lib/library/song.js";
+import HydrateSongs from "@/components/home/footer/HydrateSongs.jsx";
+import PlayerEngine from "@/components/home/footer/PlayerEngine.jsx";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +27,28 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId)
+    // TODO: ให้ redirect ไปที่หน้า home
+    return
+
+  const songs = await getAllSongs(userId);
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <AppTopbar />
-      <AppFooter />
-      <main className="pt-14 pb-28 w-dvw px-5">
-        {children}
-      </main>
-    </SidebarProvider>
+    <>
+      <PlayerEngine />
+      <SidebarProvider>
+        <AppSidebar />
+        <AppTopbar />
+        <AppFooter />
+
+        <HydrateSongs songs={songs} />
+
+        <main className="pt-14 pb-28 w-dvw px-5">
+          {children}
+        </main>
+      </SidebarProvider>
+    </>
   );
 }

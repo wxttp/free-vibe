@@ -1,10 +1,20 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MusicCard from '@/components/home/MusicCard'
+import { usePlayer } from '@/stores/usePlayer'
 
-export default function LibraryPage({ songs }) {
+
+
+export default function LibraryPage(props) {
+  const { songs } = props;
+  const { load, queue, current } = usePlayer()
   const [activeId, setActiveId] = useState(null)
   const total = songs.length
+
+  useEffect(() => {
+    if (songs?.length)
+      load(songs, 0)
+  }, [songs, load])
 
   return (
     <main className='mt-5'>
