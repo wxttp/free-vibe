@@ -1,19 +1,11 @@
+'use client'
 import React from 'react'
 
-import { getAllSongs } from "@/lib/library/song.js";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+import { useSongsStore } from "@/stores/songs";
 import LibraryPage from '@/components/home/library/LibraryPage';
 
-const page = async () => {
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
-  if (!userId)
-    // TODO: ให้ redirect ไปที่หน้า home
-    return
-
-  const songs = await getAllSongs(userId);
+const page = () => {
+  const songs = useSongsStore((s) => s.songs);
 
   return (
     <LibraryPage songs={songs} />
