@@ -90,13 +90,17 @@ const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, s
             Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
-            <CirclePlus />
-            Add music to playlist
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        {isPlaylist && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
+                <CirclePlus />
+                Add music to playlist
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

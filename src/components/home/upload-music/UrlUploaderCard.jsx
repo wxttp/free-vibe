@@ -45,7 +45,7 @@ function UrlUploaderCard(props) {
 
   return (
     <>
-      <Card className={'hover:shadow-sm! max-h-[500] h-[calc(500px-112px)] sm:h-[calc(250px)]'}>
+      <Card className={'hover:shadow-sm! max-h-[500] h-[calc(400px-112px)] sm:h-[calc(250px)]'}>
         <CardHeader>
           <div className='flex items-center gap-2'>
             <Link />
