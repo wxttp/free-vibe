@@ -53,11 +53,11 @@ export const CreatePlaylist = forwardRef(({ session, open, onClose, onCreate }, 
         <CardContent className="grid gap-6">
           <div className="grid gap-3">
             <Label htmlFor="">Playlist Name</Label>
-            <Input id="" defaultValue="" value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter playlist name" />
+            <Input id="" value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter playlist name" />
           </div>
           <div className="grid gap-3">
             <Label htmlFor="">Playlist Description</Label>
-            <Input id="" defaultValue="" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Enter playlist description"/>
+            <Input id="" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Enter playlist description"/>
           </div>
         </CardContent>
         <CardFooter>
