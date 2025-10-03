@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,14 +15,38 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { EllipsisVertical, CirclePlus, ListEnd, Pencil, Delete, Trash } from "lucide-react";
+import { EllipsisVertical, CirclePlus, ListEnd, Pencil, Trash } from "lucide-react";
+import { deletePlaylist } from "@/lib/playlist/playlist";
+import { toast } from "sonner";
+import { EditPlaylistCard } from "@/components/Playlist/EditPlaylistCard";
+import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylistCard";
+const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openAddMusic, setOpenAddMusic] = useState(false);
 
-const OptionCard = () => {
-    function handleSelect() {
-            console.log("Add music to playlist");
+  const handleEditOpen = () => setOpenEdit(true);
+  const handleAddMusicOpen = () => setOpenAddMusic(true);
+  const handleClose = () => {
+    setOpenEdit(false);
+    setOpenAddMusic(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await deletePlaylist(playlist.id);
+      if (res.status === 200) {
+        toast.success("Playlist deleted successfully");
+        onDelete(playlist.id);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
+  };
+  
   return (
     <DropdownMenu className="" modal={false}>
+      <EditPlaylistCard playlistData={playlist} onOpen={openEdit} onClose={handleClose} onEdit={onEdit} />
+      <AddMusicToPlaylistCard playlistData={playlist} onOpen={openAddMusic} onClose={handleClose} song={song} onAdd={onAdd} />
       <DropdownMenuTrigger asChild>
         <EllipsisVertical className="" />
       </DropdownMenuTrigger>
@@ -31,11 +56,11 @@ const OptionCard = () => {
             <ListEnd />
             Add to queue
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleEditOpen}>
             <Pencil />
             Edit details
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleDelete}>
             <Trash />
             {/* <Delete /> */}
             Delete
@@ -43,7 +68,7 @@ const OptionCard = () => {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer" onSelect={handleSelect}>
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
             <CirclePlus />
             Add music to playlist
           </DropdownMenuItem>

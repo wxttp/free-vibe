@@ -12,22 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createPlaylist } from "@/lib/playlist/playlist";
 import { toast } from "sonner";
+import { updatePlaylist } from "@/lib/playlist/playlist";
 
-export const CreatePlaylist = forwardRef(({ session, open, onClose, onCreate }, ref) => {
+export const EditPlaylistCard = forwardRef(({ onOpen, onClose, playlistData, onEdit },ref) => {
   const localRef = useRef(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState(playlistData.name?? "");
+  const [description, setDescription] = useState(playlistData.description?? "");
   const handleSubmit = async ()=>{
-    const newPlaylist = await createPlaylist(session.user.id, name, description);
-    toast.success("Playlist Created Successfully");
-    onCreate(newPlaylist);
+    const updatedPlaylist = await updatePlaylist(playlistData.id, name, description);
+    toast.success("Playlist Edit Successfully");
+    onEdit(updatedPlaylist);
     onClose();
   }
 
   useEffect(() => {
-    if (!open) return;
+    if (!onOpen) return;
     const handleClickOutside = (e) => {
       if (localRef.current && !localRef.current.contains(e.target)) {
         onClose();
@@ -37,31 +37,31 @@ export const CreatePlaylist = forwardRef(({ session, open, onClose, onCreate }, 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [open, onClose]);
+  }, [onOpen, onClose]);
 
-  if (!open) return null;
+  if (!onOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <Card ref={localRef} className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create Playlist</CardTitle>
+          <CardTitle>Edit Playlist</CardTitle>
           <CardDescription>
-            Create a new playlist
+            Edit the playlist details
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6">
           <div className="grid gap-3">
             <Label htmlFor="">Playlist Name</Label>
-            <Input id="" defaultValue="" value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter playlist name" />
+            <Input id=""  value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter playlist name" />
           </div>
           <div className="grid gap-3">
             <Label htmlFor="">Playlist Description</Label>
-            <Input id="" defaultValue="" value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Enter playlist description"/>
+            <Input id=""  value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Enter playlist description"/>
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={()=>handleSubmit()}>Create Playlist</Button>
+          <Button onClick={()=>handleSubmit()}>Edit Playlist</Button>
         </CardFooter>
       </Card>
     </div>

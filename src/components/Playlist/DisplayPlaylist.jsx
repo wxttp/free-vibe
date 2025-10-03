@@ -4,10 +4,43 @@ import { CreatePlaylist } from "@/components/Playlist/CreatePlaylist";
 import PlaylistCard from "@/components/Playlist/PlaylistCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import OptionCard from "@/components/Playlist/OptionCard";
+import { PlaylistView } from "@/components/Playlist/PlaylistView";
 
-const DisplayPlaylist = ({ session, playlists }) => {
+const DisplayPlaylist = ({ session, playlists, song }) => {
   const [open, setOpen] = useState(false);
+  const [activeId, setActiveId] = useState(null);
+  const [playlistOpen, setPlaylistOpen] = useState(false);
+  const [playlistState, setPlaylistState] = useState(playlists || []);
+
+  const handlePlaylistCreate = (newPlaylist) => {
+    setPlaylistState((prevPlaylists) => [...prevPlaylists, newPlaylist]);
+  };
+  const handlePlaylistDelete = (playlistId) => {
+    setPlaylistState((prevPlaylists) =>
+      prevPlaylists.filter((playlist) => playlist.id !== playlistId)
+    );
+  };
+  const handlePlaylistEdit = (updatedPlaylist) => {
+    setPlaylistState((prevPlaylists) =>
+      prevPlaylists.map((playlist) =>
+        playlist.id === updatedPlaylist.playlist.id
+          ? { ...playlist, name: updatedPlaylist.playlist.name,description:updatedPlaylist.playlist.description }
+          : playlist
+      )
+    );
+  };
+  const handlePlaylistAdd = (playlistId, songs) => {
+    setPlaylistState((prevPlaylists) =>
+      prevPlaylists.map((playlistState) =>
+        playlistState.id === playlistId
+          ? {
+              ...playlistState,
+              songs: song.filter((s) => songs.includes(s.id)),
+            }
+          : playlistState
+      )
+    );
+  };
 
   return (
     <div>
@@ -16,15 +49,20 @@ const DisplayPlaylist = ({ session, playlists }) => {
         open={open}
         onClose={() => setOpen(false)}
         session={session}
+        onCreate={handlePlaylistCreate}
       />
-      <div className="">
+      <PlaylistView
+        playlist={playlistState.find((p) => p.id === activeId) || null}
+        playlistOpen={playlistOpen}
+      />
+      <div className={!playlistOpen ? "" : "hidden"}>
         <div className="text-3xl items-center grid grid-cols-2 mb-5">
           <div className="grid grid-rows-2 ">
             <span className="text-[var(--primary-color)] font-bold">
               Playlists
             </span>
             <span className="text-sm opacity-70">
-              {playlists.length} playlists
+              {playlistState.length} playlists
             </span>
           </div>
           <Button
@@ -37,8 +75,17 @@ const DisplayPlaylist = ({ session, playlists }) => {
         </div>
 
         <div className="flex flex-col gap-5 w-full mb-5">
-          {playlists.map((playlist) => (
-            <PlaylistCard key={playlist.id} playlist={playlist} />
+          {playlistState.map((playlist) => (
+            <PlaylistCard 
+              key={playlist.id}
+              playlist={playlist}
+              onDelete={handlePlaylistDelete}
+              onEdit={handlePlaylistEdit}
+              song={song}
+              onAdd={handlePlaylistAdd}
+              setPlaylistOpen={setPlaylistOpen}
+              setActiveId={setActiveId}
+            />
           ))}
         </div>
       </div>
