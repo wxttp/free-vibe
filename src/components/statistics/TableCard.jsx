@@ -3,7 +3,7 @@ import { Card, CardTitle, CardContent } from '@/components/ui/card'
 
 const TableCard = (props) => {
   const { data } = props;
-  console.log(data);
+
   return (
     <>
         <Card>
