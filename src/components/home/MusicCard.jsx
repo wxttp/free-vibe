@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
 import { HeartPlus, Play, Pause, EllipsisVertical } from 'lucide-react'
 import { usePlayer } from '@/stores/usePlayer'
+import OptionCard from '@/components/home/library/OptionCard'
+
 
 function fmt(s = 0) {
   const t = Number.isFinite(s) ? s : 0
@@ -11,19 +13,19 @@ function fmt(s = 0) {
   return `${m}:${ss}`
 }
 
-const MusicCard = ({ song }) => {
+const MusicCard = ({ song, onEdit }) => {
   const [type, setType] = useState('Loading...')
 
   // ---- Zustand selectors (แยกเป็นตัว ๆ ลด re-render) ----
-  const current   = usePlayer(s => s.current)
+  const current = usePlayer(s => s.current)
   const isPlaying = usePlayer(s => s.isPlaying)
-  const play      = usePlayer(s => s.play)
-  const pause     = usePlayer(s => s.pause)
-  const setCurrent= usePlayer(s => s.setCurrent)     // << ต้องมีใน usePlayer
-  const duration  = usePlayer(s => s.duration)
+  const play = usePlayer(s => s.play)
+  const pause = usePlayer(s => s.pause)
+  const setCurrent = usePlayer(s => s.setCurrent)
+  const duration = usePlayer(s => s.duration)
 
   const isActive = !!current && current.id === song?.id
-  const isUrl    = !!song?.isUrl
+  const isUrl = !!song?.isUrl
 
   useEffect(() => {
     if (!song) return
@@ -36,10 +38,8 @@ const MusicCard = ({ song }) => {
   const onTogglePlay = () => {
     if (!song) return
     if (isActive) {
-      // เพลงเดียวกัน → toggle play/pause
       isPlaying ? pause() : play()
     } else {
-      // เพลงใหม่ → ตั้ง current แล้วเล่น
       setCurrent?.(song)
       play()
     }
@@ -81,7 +81,7 @@ const MusicCard = ({ song }) => {
           <HeartPlus />
         </div>
         <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-          <EllipsisVertical />
+          <OptionCard isPlaylist={false} song={song} onEdit={onEdit} />
         </div>
       </div>
     </Card>
