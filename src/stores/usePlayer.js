@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { storeSongPlay } from "@/lib/library/song"
 
 export const usePlayer = create((set, get) => ({
   queue: [],
@@ -12,7 +13,15 @@ export const usePlayer = create((set, get) => ({
   shuffle: false,
 
   load: (queue, index = 0) => set({ queue, index, current: queue[index], progress: 0 }),
-  play: () => set({ isPlaying: true }),
+  play: async () => {
+    const current = get().current
+    if (current) {
+      const res = await storeSongPlay(current.id)
+
+      console.log(res);
+    }
+    set({ isPlaying: true })
+  },
   pause: () => set({ isPlaying: false }),
   toggle: () => set({ isPlaying: !get().isPlaying }),
   next: () => {

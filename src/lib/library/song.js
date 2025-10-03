@@ -17,7 +17,7 @@ export async function getAllSongs(userId) {
   })
 }
 
-export async function updateSong(songId, title, artist){
+export async function updateSong(songId, title, artist) {
   const res = await fetch(`/api/song/${songId}/stream`,{
     method:"PUT",
     headers:{"Content-Type":"application/json"},
@@ -33,7 +33,7 @@ export async function updateSong(songId, title, artist){
   return res.json();
 }
 
-export async function deleteSong(songId){
+export async function deleteSong(songId) {
   const res = await fetch(`/api/song/${songId}/stream`,{
     method:"DELETE",
     headers:{"Content-Type":"application/json"},
@@ -43,6 +43,21 @@ export async function deleteSong(songId){
   });
   if(!res.ok){
     throw new Error("Song Not Deleted");
+  }
+  return res.json();
+}
+
+export async function storeSongPlay(songId) {
+  console.log("storeSongPlay: ", songId);
+  const res = await fetch(`/api/song/${songId}/stream`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ 
+      id: songId
+    })
+  })
+  if (!res.ok){
+    throw new Error("Song Not Stored");
   }
   return res.json();
 }
