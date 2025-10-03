@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 import prisma from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -73,4 +75,48 @@ export async function GET(req, ctx) {
       "Cache-Control": "no-store",
     },
   });
+}
+
+export async function PUT(req, ctx) {
+  const { id } = await ctx.params;
+  const songId = Number(id);
+  if (!songId)
+    return NextResponse.json({ status: 400, error: "Bad Request" });
+
+  const { title, artist } = await req.json();
+  if (!title || !artist)
+    return NextResponse.json({ status: 400, error: "Bad Request" });
+
+  try {
+    const song = await prisma.song.update({
+      where: { id: songId },
+      data: { title, artist },
+    });
+    return NextResponse.json({
+      status: 200,
+      message: "Song Updated",
+      song
+    });
+  } catch (error) {
+    return NextResponse.json({ status: 400, error: "Song Not Updated" });
+  }
+}
+
+export async function DELETE(req, ctx) {
+  const { id } = await ctx.params;
+  const songId = Number(id);
+  if (!songId)
+    return NextResponse.json({ status: 400, error: "Bad Request" });
+
+  try {
+    await prisma.song.delete({
+      where: { id: songId },
+    });
+    return NextResponse.json({
+      status: 200,
+      message: "Song Deleted",
+    });
+  } catch (error) {
+    return NextResponse.json({ status: 400, error: "Song Not Deleted" });
+  }
 }
