@@ -25,6 +25,7 @@ model User {
   playlists  Playlist[]
   favorites  Favorite[]
   accounts   Account[]
+  songPlay SongPlay[]
   emailVerified DateTime?
 }
 
@@ -64,6 +65,7 @@ model Song {
   time       Int?
   favorites  Favorite[]
   playlists  PlaylistSong[]
+  songPlay SongPlay[]
 }
 
 model Favorite {
@@ -95,4 +97,18 @@ model PlaylistSong {
 
   song         Song     @relation(fields: [songs_id], references: [id])
   songs_id      Int
+}
+
+model SongPlay {
+  id        Int      @id @default(autoincrement())
+  played_at  DateTime @default(now())
+
+  user   User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id Int
+
+  song   Song @relation(fields: [song_id], references: [id], onDelete: Cascade)
+  song_id Int
+
+  @@index([user_id, played_at])
+  @@index([song_id, played_at])
 }
