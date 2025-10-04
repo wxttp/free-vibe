@@ -23,7 +23,7 @@ import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylist
 import { deleteSong } from "@/lib/library/song";
 
 
-const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
+const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, song, onAdd, setTitle, setArtist }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddMusic, setOpenAddMusic] = useState(false);
 
@@ -48,7 +48,7 @@ const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, s
 
         if (res.status === 200) {
           toast.success(`${isPlaylist ? "Playlist" : "Song"} deleted successfully`);
-          window.location.reload();
+          onDelete(song.id);
         }
       }
     } catch (error) {
@@ -66,7 +66,7 @@ const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, s
       )}
       { !isPlaylist && (
         <>
-          <EditPlaylistCard isPlaylist={isPlaylist} song={song} onOpen={openEdit} onClose={handleClose} />
+          <EditPlaylistCard isPlaylist={isPlaylist} song={song} onOpen={openEdit} onClose={handleClose} setTitle={setTitle} setArtist={setArtist} />
         </>
       )}
       <DropdownMenuTrigger asChild>

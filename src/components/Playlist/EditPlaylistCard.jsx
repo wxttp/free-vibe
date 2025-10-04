@@ -17,7 +17,7 @@ import { updatePlaylist } from "@/lib/playlist/playlist";
 import { updateSong } from "@/lib/library/song";
 
 
-export const EditPlaylistCard = forwardRef(({ isPlaylist=true, onOpen, onClose, playlistData, onEdit, song },ref) => {
+export const EditPlaylistCard = forwardRef(({ isPlaylist=true, onOpen, onClose, playlistData, onEdit, song, setTitle, setArtist },ref) => {
   const localRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
@@ -35,9 +35,9 @@ export const EditPlaylistCard = forwardRef(({ isPlaylist=true, onOpen, onClose, 
       setLoading(true);
       const updatedSong = await updateSong(song.id, name, description);
       toast.success("Song Edit Successfully");
-      // onEdit(updatedSong);
+      setTitle(updatedSong.song.title)
+      setArtist(updatedSong.song.artist)
       onClose();
-      window.location.reload();
     }
     setLoading(false);
   }

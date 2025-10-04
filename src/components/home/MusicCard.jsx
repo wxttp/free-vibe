@@ -1,20 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
-import { HeartPlus, Play, Pause, EllipsisVertical } from 'lucide-react'
+import { HeartPlus, Play, Pause, Heart } from 'lucide-react'
 import { usePlayer } from '@/stores/usePlayer'
 import OptionCard from '@/components/home/library/OptionCard'
+import { addToFavorites } from '@/lib/library/song'
+import { toast } from "sonner";
 
-
-function fmt(s = 0) {
-  const t = Number.isFinite(s) ? s : 0
-  const m = Math.floor(t / 60)
-  const ss = Math.floor(t % 60).toString().padStart(2, '0')
-  return `${m}:${ss}`
-}
-
-const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
+const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
   const [type, setType] = useState('Loading...')
+  const [isFavorite, setIsFavorite] = useState(song?.isFavorite ?? false);
+  const [title, setTitle] = useState(song?.title ?? 'Loading...')
+  const [artist, setArtist] = useState(song?.artist ?? 'Loading...')
 
   // Zustand selectors (แยกเป็นตัว ๆ ลด re-render) ----
   const current = usePlayer(s => s.current)
@@ -28,7 +25,8 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
   const isUrl = !!song?.isUrl
 
   useEffect(() => {
-    if (!song) return
+    if (!song)
+      return
     const t = setTimeout(() => {
       setType(isUrl ? 'Url' : 'File')
     }, 300)
@@ -41,12 +39,31 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
       return
     }
 
-    if (!song) return
+    if (!song)
+      return
+
     if (isActive) {
       isPlaying ? pause() : play()
     } else {
       setCurrent?.(song)
       play()
+    }
+  }
+
+  const handleAddToFavorites = async () => {
+    try {
+      const res = await addToFavorites(song.id);
+
+      if (res.status === 201 && res.isExist === false) {
+        toast.success("Song added to favorites");
+        setIsFavorite(true);
+      }
+      else if (res.status === 200 && res.isExist === true) {
+        toast.success("Song removed from favorites");
+        setIsFavorite(false);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   }
 
@@ -65,9 +82,9 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
 
         <div className="flex flex-col space-y-3">
           <CardTitle className="font-extrabold">
-            {song?.title ?? 'Untitled'}
+            {title}
           </CardTitle>
-          <CardDescription>{song?.artist ?? ''}</CardDescription>
+          <CardDescription>{artist}</CardDescription>
 
           <div className="flex space-x-5">
             <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
@@ -81,11 +98,27 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
         {
           isOwner && (
           <>
+            {
+              isFavorite ? (
+                <>
+                  <button onClick={handleAddToFavorites}>
+                    <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+                        <Heart className={"fill-[var(--primary-color)]"} />
+                    </div>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={handleAddToFavorites}>
+                    <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+                        <HeartPlus />
+                    </div>
+                  </button>
+                </>
+              )
+            }
             <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-              <HeartPlus />
-            </div>
-            <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-              <OptionCard isPlaylist={false} song={song} onEdit={onEdit} />
+              <OptionCard isPlaylist={false} song={song} onEdit={onEdit} onDelete={onDelete} setTitle={setTitle} setArtist={setArtist} />
             </div>
           </>
         )

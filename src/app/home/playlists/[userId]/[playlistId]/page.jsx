@@ -6,14 +6,21 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DisplayPlaylist from "@/components/Playlist/DisplayPlaylist";
 import { getAllSongs } from "@/lib/library/song";
 
-
 const PlaylistsPage = async ({ params }) => {
   const { userId, playlistId } = params;
 
   const playlists = await getPlaylistById(Number(userId), Number(playlistId));
 
   if (!playlists) {
-    return <div>Playlist not found</div>
+    return (
+      <>
+        <div className="w-full h-full flex flex-col justify-center items-center text-xl">
+          <div className="text-9xl font-black text-[var(--primary-color)]">Oops!</div>
+          <div className="font-bold mt-10 text-[var(--background-color)]">403 - Forbidden</div>
+          <div className="mt-0 text-[var(--primary-color-hover)]">This playlist is private</div>
+        </div>
+      </>
+    );
   }
 
   const song = await getAllSongs(Number(userId));

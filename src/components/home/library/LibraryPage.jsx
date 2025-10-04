@@ -6,15 +6,25 @@ import { usePlayer } from '@/stores/usePlayer'
 
 
 export default function LibraryPage(props) {
-  const { songs } = props;
   const { load, queue, current } = usePlayer()
+  const [songs, setSongs] = useState(props.songs)
   const [activeId, setActiveId] = useState(null)
   const total = songs.length
+
+  useEffect(() => {
+    setSongs(props.songs || []);
+  }, [props.songs]);
 
   useEffect(() => {
     if (songs?.length)
       load(songs, 0)
   }, [songs, load])
+
+  const handleSongDelete = (songId) => {
+    setSongs((prevSongs) =>
+      prevSongs.filter((song) => song.id !== songId)
+    );
+  };
 
   return (
     <main className='mt-5'>
@@ -32,6 +42,7 @@ export default function LibraryPage(props) {
             activate={() => setActiveId(song.id)}
             deactivate={() => setActiveId(null)}
             onEnded={() => setActiveId(null)}
+            onDelete={handleSongDelete}
           />
         ))}
       </div>
