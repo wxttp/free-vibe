@@ -17,7 +17,7 @@ const PlaylistsPage = async () => {
   const song = await getAllSongs(userId);
 
   return (
-    <main className="flex flex-col mt-5 min-w-full min-h-screen">
+    <main className="flex flex-col mt-5 min-w-screen sm:min-w-full min-h-screen">
       <DisplayPlaylist session={session} playlists={playlists} song={song} />
     </main>
   );

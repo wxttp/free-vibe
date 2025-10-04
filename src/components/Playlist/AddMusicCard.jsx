@@ -43,14 +43,12 @@ export const AddMusicCard = ({ song, selectSong, setSelectSong }) => {
             <ListPlus className="w-10 h-10 text-[var(--primary-color)] self-center" />
             {/* <Input className="w-6 h-6" id="music" type="checkbox" /> */}
             <div className="grid grid-rows-3 gap-0">
-              <CardTitle className="font-extrabold">{song?.title}</CardTitle>
+              <CardTitle className="font-extrabold sm:hidden">{song?.title ? (song.title.length > 25 ? song.title.slice(0, 25) + "..." : song.title) : "No Title"}</CardTitle>
+              <CardTitle className="font-extrabold hidden sm:block">{song?.title}</CardTitle>
               <CardDescription>{song?.artist}</CardDescription>
               <div className="flex space-x-5 font-medium text-muted-foreground">
                 <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
                   {type === "Loading..." ? "Loading..." : type}
-                </div>
-                <div className="font-medium">
-                  Duration: {song?.duration ? "-" : "00:00"}
                 </div>
               </div>
             </div>

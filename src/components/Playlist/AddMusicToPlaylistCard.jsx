@@ -44,7 +44,7 @@ export const AddMusicToPlaylistCard = forwardRef(({ onOpen, onClose, onAdd, play
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <Card ref={localRef} className="w-full max-w-md max-h-[60vh] flex flex-col">
+      <Card ref={localRef} className={"max-w-[100dvw] max-h-[90dvh] sm:max-w-[80dvw] sm:max-h-[80dvh] flex flex-col"}>
         <CardHeader>
           <CardTitle>Add Music to {playlistData.name}</CardTitle>
           <CardDescription>
