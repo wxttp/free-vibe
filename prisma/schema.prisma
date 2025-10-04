@@ -62,7 +62,6 @@ model Song {
 
   user       User      @relation(fields: [users_id], references: [id])
   users_id    Int
-  time       Int?
   favorites  Favorite[]
   playlists  PlaylistSong[]
   songPlay SongPlay[]
@@ -85,8 +84,11 @@ model Playlist {
   description String?
   user       User      @relation(fields: [users_id], references: [id])
   users_id    Int
+  is_public    Boolean  @default(false)
 
   songs      PlaylistSong[]
+
+  @@unique([id, users_id])
 }
 
 model PlaylistSong {
