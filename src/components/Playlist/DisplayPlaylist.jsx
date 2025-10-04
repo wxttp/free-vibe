@@ -5,12 +5,23 @@ import PlaylistCard from "@/components/Playlist/PlaylistCard";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PlaylistView } from "@/components/Playlist/PlaylistView";
+import { usePlayer } from '@/stores/usePlayer'
 
 const DisplayPlaylist = ({ session, playlists, song }) => {
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [playlistOpen, setPlaylistOpen] = useState(false);
-  const [playlistState, setPlaylistState] = useState(playlists || []);
+  const [playlistState, setPlaylistState] = useState(session ? playlists : [playlists] || []);
+
+  const load = usePlayer(s => s.load)
+  const current = usePlayer(s => s.current)
+
+  useEffect(() => {
+    if (playlists?.songs?.length) {
+      const queue = playlists.songs.map(ps => ps.song)
+      load(queue, 0)
+    }
+  }, [playlists, load])
 
   const handlePlaylistCreate = (newPlaylist) => {
     setPlaylistState((prevPlaylists) => [...prevPlaylists, newPlaylist]);
@@ -44,16 +55,21 @@ const DisplayPlaylist = ({ session, playlists, song }) => {
 
   return (
     <div>
-      <CreatePlaylist
+      {
+        session &&
+        <CreatePlaylist
         className="w-full max-w-md"
         open={open}
         onClose={() => setOpen(false)}
         session={session}
         onCreate={handlePlaylistCreate}
       />
+      }
       <PlaylistView
+        isOwner={session}
         playlist={playlistState.find((p) => p.id === activeId) || null}
         playlistOpen={playlistOpen}
+        onClose={() => setPlaylistOpen(false)}
       />
       <div className={!playlistOpen ? "" : "hidden"}>
         <div className="text-3xl items-center grid grid-cols-2 mb-5">
@@ -85,6 +101,7 @@ const DisplayPlaylist = ({ session, playlists, song }) => {
               onAdd={handlePlaylistAdd}
               setPlaylistOpen={setPlaylistOpen}
               setActiveId={setActiveId}
+              isOwner={session}
             />
           ))}
         </div>

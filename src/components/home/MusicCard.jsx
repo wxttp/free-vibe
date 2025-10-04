@@ -13,10 +13,10 @@ function fmt(s = 0) {
   return `${m}:${ss}`
 }
 
-const MusicCard = ({ song, onEdit }) => {
+const MusicCard = ({ isOwner = true, song, onEdit, onPlay }) => {
   const [type, setType] = useState('Loading...')
 
-  // ---- Zustand selectors (แยกเป็นตัว ๆ ลด re-render) ----
+  // Zustand selectors (แยกเป็นตัว ๆ ลด re-render) ----
   const current = usePlayer(s => s.current)
   const isPlaying = usePlayer(s => s.isPlaying)
   const play = usePlayer(s => s.play)
@@ -36,6 +36,11 @@ const MusicCard = ({ song, onEdit }) => {
   }, [song, isUrl])
 
   const onTogglePlay = () => {
+    if (onPlay) {
+      onPlay()
+      return
+    }
+
     if (!song) return
     if (isActive) {
       isPlaying ? pause() : play()
@@ -68,21 +73,23 @@ const MusicCard = ({ song, onEdit }) => {
             <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
               {type}
             </div>
-            <div className="font-medium">
-              {/* แสดง duration เฉพาะเมื่อเป็นเพลงที่ active (อ่านจาก store) */}
-              Duration: {isActive ? fmt(duration) : (isUrl ? '-' : '-')}
-            </div>
           </div>
         </div>
       </div>
 
       <div className="flex flex-wrap">
-        <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-          <HeartPlus />
-        </div>
-        <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-          <OptionCard isPlaylist={false} song={song} onEdit={onEdit} />
-        </div>
+        {
+          isOwner && (
+          <>
+            <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+              <HeartPlus />
+            </div>
+            <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+              <OptionCard isPlaylist={false} song={song} onEdit={onEdit} />
+            </div>
+          </>
+        )
+        }
       </div>
     </Card>
   )

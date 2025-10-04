@@ -4,17 +4,18 @@ import { ListMusic, EllipsisVertical, Play } from "lucide-react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import OptionCard from "./OptionCard";
+import { usePlayer } from "@/stores/usePlayer";
 
 const PlaylistCard = (props) => {
-  const sec = props.playlist.playlistTime % 60;
-  const min = Math.floor(props.playlist.playlistTime / 60) % 60;
-  const hour = Math.floor(props.playlist.playlistTime / 60 / 60) || 0;
-  const timeFormat = () => {
-    if (hour) {
-      return `${hour}:${min}:${sec}`;
-    } else {
-      return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
-    }
+  const { isOwner } = props;
+
+  const player = usePlayer();
+
+  const handlePlayPlaylist = () => {
+    if (!props.playlist || !props.playlist.songs?.length) return;
+    const queue = props.playlist.songs.map(s => s.song);
+    player.load(queue, 0);
+    player.play();
   };
 
   return (
@@ -37,28 +38,28 @@ const PlaylistCard = (props) => {
               {props.playlist.songs.length || 0} songs
             </div>
             <div className="text-center text-muted-foreground text-medium">
-              {timeFormat()}
-            </div>
-            <div className="text-center text-muted-foreground text-medium">
               Created {new Date(props.playlist.created_at).toLocaleDateString()}
             </div>
           </div>
         </div>
       </div>
       <div className="flex flex-row items-center gap-2">
-        <Button className="gap-2 w-fit h-fit">
+        <Button className="gap-2 w-fit h-fit" onClick={handlePlayPlaylist}>
           <Play />
           Play
         </Button>
-        <div className="w-[44px] h-[44px] hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer flex items-center">
-          <OptionCard
-            playlist={props.playlist}
-            onDelete={props.onDelete}
-            onEdit={props.onEdit}
-            song={props.song}
-            onAdd={props.onAdd}
-          />
-        </div>
+        {
+          isOwner &&
+          <div className="w-[44px] h-[44px] hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer flex items-center">
+            <OptionCard
+              playlist={props.playlist}
+              onDelete={props.onDelete}
+              onEdit={props.onEdit}
+              song={props.song}
+              onAdd={props.onAdd}
+            />
+          </div>
+        }
       </div>
     </Card>
   );

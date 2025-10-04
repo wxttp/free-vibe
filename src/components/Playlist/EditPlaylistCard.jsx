@@ -21,7 +21,7 @@ export const EditPlaylistCard = forwardRef(({ isPlaylist=true, onOpen, onClose, 
   const localRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(isPlaylist ? playlistData.name ?? "" : song.title ?? "");
+  const [name, setName] = useState(isPlaylist ? playlistData.name ?? "" : song?.title ?? "");
   const [description, setDescription] = useState(isPlaylist ? playlistData.description ?? "" : song.artist ?? "");
 
   const handleSubmit = async () => {
