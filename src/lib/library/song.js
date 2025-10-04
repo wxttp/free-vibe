@@ -12,7 +12,6 @@ export async function getAllSongs(userId) {
       artist: true,
       isUrl: true,
       url: true,
-      time: true,
     },
   })
 }

@@ -16,12 +16,26 @@ export async function getAllPlaylists(session) {
       },
     }
   )
-  const data = playlists.map((item)=>({
-    ...item,
-    playlistTime : item.songs.reduce((acc,cur)=>acc+cur.song.time,0),
-  }))
-  return data
+  return playlists
 };
+
+export async function getPlaylistById(userId, playlistId) {
+  if (!userId || !playlistId)
+    return;
+  
+  const uid = Number(userId);
+  const pid = Number(playlistId);
+
+  return prisma.playlist.findUnique({
+    where: { id: pid, users_id: uid, is_public: true },
+    include: {
+      songs: {
+        include: { song: true }
+      },
+      user: true,
+    },
+  })
+}
 
 export async function createPlaylist(userId, name, description){
   const res = await fetch("/api/playlist",{
@@ -81,6 +95,20 @@ export async function addSongsToPlaylist(playlistId,songs){
   })
   if (!res.ok){
     throw new Error("Add song to playlist failed");
+  }
+  return res.json();
+}
+
+export async function publishPlaylist(playlistId) {
+  const res = await fetch("/api/playlist/publish",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      id: playlistId,
+    })
+  })
+  if (!res.ok){
+    throw new Error("Playlist Not Updated");
   }
   return res.json();
 }
