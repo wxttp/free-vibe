@@ -17,9 +17,8 @@ export const usePlayer = create((set, get) => ({
     const current = get().current
     if (current) {
       const res = await storeSongPlay(current.id)
-
-      console.log(res);
     }
+
     set({ isPlaying: true })
   },
   pause: () => set({ isPlaying: false }),

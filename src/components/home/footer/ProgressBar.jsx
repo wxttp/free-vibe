@@ -18,7 +18,7 @@ export function ProgressBar({ getCurrentTime, getDuration }) {
   }, [getCurrentTime, getDuration])
 
   return (
-    <div className="relative h-2 w-full bg-[var(--background-color)] rounded overflow-hidden">
+    <div className="relative h-2 w-[70%] flex justify-center items-center bg-[var(--background-color)] rounded overflow-hidden">
       <div ref={barRef} className="absolute left-0 top-0 h-full bg-[var(--primary-color)]" style={{ width: "0%" }} />
     </div>
   )

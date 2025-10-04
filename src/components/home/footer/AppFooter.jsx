@@ -41,12 +41,12 @@ export function AppFooter() {
 
         <div className="col-span-2 w-full h-full flex justify-center items-center flex-col gap-2">
           <div className="flex justify-center items-center gap-5">
-            <button
+            {/* <button
               onClick={usePlayer.getState().toggleShuffle}
               className={shuffle ? "w-fit bg-[var(--primary-color)] rounded-md p-3" : "w-fit hover:bg-[var(--primary-color)] rounded-md p-3"}
             >
               <Shuffle className="w-4 h-4" />
-            </button>
+            </button> */}
             <button onClick={prev} className="w-fit hover:bg-[var(--primary-color)] rounded-md p-3">
               <SkipBack className="w-4 h-4" />
             </button>
@@ -56,16 +56,16 @@ export function AppFooter() {
             <button onClick={next} className="w-fit hover:bg-[var(--primary-color)] rounded-md p-3">
               <SkipForward className="w-4 h-4" />
             </button>
-            <button
+            {/* <button
               onClick={usePlayer.getState().toggleRepeat}
               className={repeat ? "w-fit bg-[var(--primary-color)] rounded-md p-3" : "w-fit hover:bg-[var(--primary-color)] rounded-md p-3"}
             >
               <Repeat className="w-4 h-4" />
-            </button>
+            </button> */}
           </div>
 
           <div className="w-[min(640px,90vw)] flex flex-col gap-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <span className="w-12 text-right tabular-nums text-xs">{formatTime(getCur())}</span>
               <ProgressBar getCurrentTime={getCur} getDuration={getDur} />
               <span className="w-12 tabular-nums text-xs">{formatTime(getDur())}</span>
