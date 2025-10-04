@@ -60,7 +60,7 @@ model Song {
   isUrl      Boolean   @default(false)
   created_at  DateTime @default(now())
 
-  user       User      @relation(fields: [users_id], references: [id])
+  user       User      @relation(fields: [users_id], references: [id], onDelete: Cascade)
   users_id    Int
   favorites  Favorite[]
   playlists  PlaylistSong[]
@@ -70,11 +70,15 @@ model Song {
 model Favorite {
   id       Int    @id @default(autoincrement())
   
-  user     User   @relation(fields: [users_id], references: [id])
+  user     User   @relation(fields: [users_id], references: [id], onDelete: Cascade)
   users_id  Int
 
-  song     Song   @relation(fields: [songs_id], references: [id])
+  song     Song   @relation(fields: [songs_id], references: [id], onDelete: Cascade)
   songs_id  Int
+
+  // กันกดซ้ำเพลงเดิม
+  @@unique([users_id, songs_id])
+  @@index([songs_id])
 }
 
 model Playlist {
@@ -82,7 +86,7 @@ model Playlist {
   name       String
   created_at  DateTime @default(now())
   description String?
-  user       User      @relation(fields: [users_id], references: [id])
+  user       User      @relation(fields: [users_id], references: [id], onDelete: Cascade)
   users_id    Int
   is_public    Boolean  @default(false)
 
@@ -94,10 +98,10 @@ model Playlist {
 model PlaylistSong {
   id           Int      @id @default(autoincrement())
 
-  playlist     Playlist @relation(fields: [playlists_id], references: [id])
+  playlist     Playlist @relation(fields: [playlists_id], references: [id], onDelete: Cascade)
   playlists_id  Int
 
-  song         Song     @relation(fields: [songs_id], references: [id])
+  song         Song     @relation(fields: [songs_id], references: [id], onDelete: Cascade)
   songs_id      Int
 }
 
