@@ -1,18 +1,17 @@
 import React from 'react'
+import { getFavoriteSongs } from '@/lib/library/song'
+import { getServerSession } from "next-auth";
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import FavortiesPage from '@/components/home/favorites/FavortiesPage'
 
-const FavoritesPage = () => {
+const page = async () => {
+  const session = await getServerSession(authOptions)
+  const userId = session?.user?.id
+  const songs = await getFavoriteSongs(userId)
+
   return (
-    <main className='mt-5'>
-      <div className='text-3xl flex flex-col mb-5'>
-        <span className='text-[var(--primary-color)] font-bold'>Favorites</span>
-        <span className='text-sm opacity-70'> songs</span>
-      </div>
-
-      <div className='flex flex-col gap-5 w-full mb-5'>
-        
-      </div>
-    </main>
+    <FavortiesPage songs={songs}/>
   )
 }
 
-export default FavoritesPage
+export default page

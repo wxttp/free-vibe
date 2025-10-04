@@ -12,8 +12,42 @@ export async function getAllSongs(userId) {
       artist: true,
       isUrl: true,
       url: true,
+
+      favorites: {
+        where: { users_id: userId },
+        select: { id: true },
+      },
     },
-  })
+  }).then(songs =>
+    songs.map(s => ({
+      ...s,
+      isFavorite: s.favorites.length > 0,
+    }))
+  )
+}
+
+export async function getFavoriteSongs(userId) {
+  if (!userId) return;
+
+  return prisma.song.findMany({
+    where: {
+      favorites: {
+        some: { users_id: userId } 
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      artist: true,
+      isUrl: true,
+      url: true,
+    },
+  }).then(songs =>
+    songs.map(s => ({
+      ...s,
+      isFavorite: true,
+    }))
+  );
 }
 
 export async function updateSong(songId, title, artist) {
@@ -47,8 +81,7 @@ export async function deleteSong(songId) {
 }
 
 export async function storeSongPlay(songId) {
-  console.log("storeSongPlay: ", songId);
-  const res = await fetch(`/api/song/${songId}/stream`,{
+  const res = await fetch(`/api/song/${songId}/count`,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({ 
@@ -57,6 +90,20 @@ export async function storeSongPlay(songId) {
   })
   if (!res.ok){
     throw new Error("Song Not Stored");
+  }
+  return res.json();
+}
+
+export async function addToFavorites(songId) {
+  const res = await fetch(`/api/song/${songId}/favorites`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ 
+      id: songId
+    })
+  })
+  if (!res.ok){
+    throw new Error("Song Not Added to Favorites");
   }
   return res.json();
 }
