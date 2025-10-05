@@ -11,10 +11,11 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
   const router = useRouter();
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (register.password.length < 8) {
+    if (register.password.length < 8 && register.confirmPassword.length < 8) {
       toast.error("Password must be at least 8 characters long!");
       return;
     }
+
     if (register.password != register.confirmPassword) {
       toast.error("Passwords do not match!");
       return;
@@ -74,7 +75,7 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
             id="password"
             type="password"
             name="password"
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            // pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
             value={register.password}
             onChange={handleRegisterChange}
             placeholder="Enter your password"
@@ -89,7 +90,7 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
             id="confirmPassword"
             name="confirmPassword"
             type="password"
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            // pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
             value={register.confirmPassword}
             onChange={handleRegisterChange}
             placeholder="Enter your confirm password"

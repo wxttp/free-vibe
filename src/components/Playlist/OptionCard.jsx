@@ -1,18 +1,11 @@
 'use client'
 import React, { useState } from 'react'
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { EllipsisVertical, CirclePlus, ListEnd, Pencil, Trash } from "lucide-react";
@@ -20,7 +13,7 @@ import { deletePlaylist } from "@/lib/playlist/playlist";
 import { toast } from "sonner";
 import { EditPlaylistCard } from "@/components/Playlist/EditPlaylistCard";
 import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylistCard";
-const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
+const OptionCard = ({ playlist, onDelete, onEdit, song, onAdd }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddMusic, setOpenAddMusic] = useState(false);
 
@@ -62,7 +55,6 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer" onSelect={handleDelete}>
             <Trash />
-            {/* <Delete /> */}
             Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>

@@ -8,6 +8,8 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
+import { toast } from "sonner";
+import { updateUserPassword } from "@/lib/user/user";
 import { Button } from "@/components/ui/button";
 const PasswordSetting = ({ userData }) => {
   const [form, setForm] = useState({
@@ -22,22 +24,38 @@ const PasswordSetting = ({ userData }) => {
     
     const payload = {};
     e.preventDefault();
-    if (form.name !== userData.name) {
-      if (form.name.trim() === "") {
-        toast.error("Name is required");
-        return;
-      }
-      payload.name = form.name;
+    if (form.oldPassword.trim() === "") {
+      toast.error("Current password is required");
+      return;
     }
-    if (form.email !== userData.email && form.email.trim() !== "") {
-      if (form.email.trim() === "") {
-        toast.error("Email is required");
-        return;
-      }
-      payload.email = form.email;
+    if (form.newPassword.trim() === "") {
+      toast.error("New password is required");
+      return;
     }
+    if (form.confirmPassword.trim() === "") {
+      toast.error("Confirm password is required");
+      return;
+    }
+    if (form.oldPassword.length < 8) {
+      toast.error("Current password must be at least 8 characters long");
+      return;
+    }
+    if (form.newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters long");
+      return;
+    }
+    if (form.confirmPassword.length < 8) {
+      toast.error("Confirm password must be at least 8 characters long");
+      return;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      toast.error("New password and confirm password do not match");
+      return;
+    }
+    payload.oldPassword = form.oldPassword;
+    payload.newPassword = form.newPassword;
     try {
-      const updatedUser = await updateUserData(userData.id, payload);
+      const updatedUser = await updateUserPassword(userData.id, payload);
       toast.success("User updated successfully");
     } catch (error) {
       toast.error(error.message);
