@@ -12,6 +12,14 @@ const LoginTabs = ({ handleLoginChange, login, setLogin }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!login.email || !login.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (login.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
     try {
       const result = await signIn("credentials", {
         email: login.email,
@@ -53,7 +61,7 @@ const LoginTabs = ({ handleLoginChange, login, setLogin }) => {
             id="password"
             name="password"
             type="password"
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            // pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
             value={login.password}
             onChange={handleLoginChange}
             placeholder="Enter your password"

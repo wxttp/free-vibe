@@ -11,10 +11,11 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
   const router = useRouter();
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (register.password.length < 8) {
+    if (register.password.length < 8 && register.confirmPassword.length < 8) {
       toast.error("Password must be at least 8 characters long!");
       return;
     }
+
     if (register.password != register.confirmPassword) {
       toast.error("Passwords do not match!");
       return;
@@ -30,7 +31,23 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
     if (data.status === 200) {
       setRegister({ name: "", email: "", password: "", confirmPassword: "" });
       toast.success("Registeration successfull!");
+
       try {
+        // sent email
+        const sendEmailRes = await fetch("/api/sendEmail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: register.email,
+            subject: "Welcome to Free Vibe",
+            text: `Hello ${register.email}, welcome to Free Vibe. We are glad to have you on board.`,
+          }),
+        });
+        if (sendEmailRes.status !== 200) {
+          console.error("Failed to send email");
+        }
         const result = await signIn("credentials", {
           email: register.email,
           password: register.password,
@@ -74,7 +91,7 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
             id="password"
             type="password"
             name="password"
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            // pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
             value={register.password}
             onChange={handleRegisterChange}
             placeholder="Enter your password"
@@ -89,7 +106,7 @@ const RegisterTabs = ({ handleRegisterChange, register, setRegister }) => {
             id="confirmPassword"
             name="confirmPassword"
             type="password"
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            // pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
             value={register.confirmPassword}
             onChange={handleRegisterChange}
             placeholder="Enter your confirm password"
