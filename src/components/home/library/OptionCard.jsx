@@ -21,9 +21,12 @@ import { toast } from "sonner";
 import { EditPlaylistCard } from "@/components/Playlist/EditPlaylistCard";
 import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylistCard";
 import { deleteSong } from "@/lib/library/song";
+import { useRouter } from "next/navigation";
 
 
 const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, song, onAdd, setTitle, setArtist }) => {
+  const router = useRouter();
+
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddMusic, setOpenAddMusic] = useState(false);
 
@@ -35,25 +38,50 @@ const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, s
   };
 
   const handleDelete = async () => {
-    try {
-      if (isPlaylist) {
-        const res = await deletePlaylist(playlist.id);
+    // try {
+    //   toast.promise("");
+    //   if (isPlaylist) {
+    //     const res = await deletePlaylist(playlist.id);
 
-        if (res.status === 200) {
-          toast.success(`${isPlaylist ? "Playlist" : "Song"} deleted successfully`);
-          onDelete(isPlaylist ? playlist.id : song.id);
-        }
-      } else {
-        const res = await deleteSong(song.id);
+    //     if (res.status === 200) {
+    //       toast.success(`${isPlaylist ? "Playlist" : "Song"} deleted successfully`);
+    //       onDelete(isPlaylist ? playlist.id : song.id);
+    //     }
+    //   } else {
+    //     const res = await deleteSong(song.id);
 
-        if (res.status === 200) {
-          toast.success(`${isPlaylist ? "Playlist" : "Song"} deleted successfully`);
-          onDelete(song.id);
-        }
+    //     if (res.status === 200) {
+    //       toast.success(`${isPlaylist ? "Playlist" : "Song"} deleted successfully`);
+    //       onDelete(song.id);
+    //     }
+    //   }
+    // } catch (error) {
+    //   toast.error(error.message);
+    // }
+
+    const targetName = isPlaylist ? "Playlist" : "Song"
+    const id = isPlaylist ? playlist?.id : song?.id
+
+    toast.promise(
+      (async () => {
+        const res = isPlaylist
+          ? await deletePlaylist(id)
+          : await deleteSong(id)
+
+        if (res.status !== 200)
+          throw new Error("Delete failed")
+
+        return res
+      })(),
+      {
+        loading: `Deleting ${targetName}...`,
+        success: (res) => {
+          window.location.reload();
+          return `${targetName} deleted successfully`
+        },
+        error: (err) => err.message || `Failed to delete ${targetName}`,
       }
-    } catch (error) {
-      toast.error(error.message);
-    }
+    )
   };
   
   return (
@@ -96,7 +124,7 @@ const OptionCard = ({ isPlaylist, playlist, onDelete, onOpen, onClose, onEdit, s
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
                 <CirclePlus />
-                Add music to playlist
+                Add / Remove music to playlist
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

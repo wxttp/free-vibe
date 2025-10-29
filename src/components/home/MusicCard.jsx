@@ -6,9 +6,10 @@ import { usePlayer } from '@/stores/usePlayer'
 import OptionCard from '@/components/home/library/OptionCard'
 import { addToFavorites } from '@/lib/library/song'
 import { toast } from "sonner";
+import { Skeleton } from '@/components/ui/skeleton'
 
 const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
-  const [type, setType] = useState('Loading...')
+  const [type, setType] = useState(null)
   const [isFavorite, setIsFavorite] = useState(song?.isFavorite ?? false);
   const [title, setTitle] = useState(song?.title ?? 'Loading...')
   const [artist, setArtist] = useState(song?.artist ?? 'Loading...')
@@ -82,14 +83,19 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
 
         <div className="flex flex-col space-y-3">
           <CardTitle className="font-extrabold">
-            {title}
+            {type ? title : <Skeleton className="h-6 w-[150px]" />}
           </CardTitle>
-          <CardDescription>{artist}</CardDescription>
+          <CardDescription>{type ? artist : <Skeleton className="h-4 w-[100px]" />}</CardDescription>
 
           <div className="flex space-x-5">
-            <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
-              {type}
-            </div>
+            {type ? (
+              <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
+                {type}
+              </div>
+              ) : (
+                <Skeleton className="h-6 w-[50px]" />
+              )
+            }
           </div>
         </div>
       </div>

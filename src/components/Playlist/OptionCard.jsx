@@ -27,15 +27,32 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
   };
 
   const handleDelete = async () => {
-    try {
-      const res = await deletePlaylist(playlist.id);
-      if (res.status === 200) {
-        toast.success("Playlist deleted successfully");
-        onDelete(playlist.id);
+    toast.promise(
+      (async () => {
+        const res = await deletePlaylist(playlist.id)
+
+        if (res.status !== 200)
+          throw new Error("Delete failed")
+
+        onDelete(playlist.id)
+        return res
+      })(),
+      {
+        loading: `Deleting playlist...`,
+        success: `Playlist deleted successfully`,
+        error: (err) => err.message || `Failed to delete playlist`,
       }
-    } catch (error) {
-      toast.error(error.message);
-    }
+    )
+
+    // try {
+    //   const res = await deletePlaylist(playlist.id);
+    //   if (res.status === 200) {
+    //     toast.success("Playlist deleted successfully");
+    //     onDelete(playlist.id);
+    //   }
+    // } catch (error) {
+    //   toast.error(error.message);
+    // }
   };
 
   const handlePublish = async () => {
@@ -83,7 +100,7 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
             <CirclePlus />
-            Add music to playlist
+            Add / Remove music to playlist
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
