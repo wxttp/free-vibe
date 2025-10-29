@@ -1,15 +1,15 @@
 
 import React from "react";
 import { getPlaylistById } from "@/lib/playlist/playlist";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DisplayPlaylist from "@/components/Playlist/DisplayPlaylist";
 import { getAllSongs } from "@/lib/library/song";
 import { decodeId } from "@/lib/ids";
 
 const PlaylistsPage = async ({ params }) => {
-  const userId = decodeId(params.userId);
-  const playlistId = decodeId(params.playlistId);
+  const { userId: encodedUserId, playlistId: encodedPlaylistId } = await params;
+
+  const userId = decodeId(encodedUserId);
+  const playlistId = decodeId(encodedPlaylistId);
   if (!userId || !playlistId) {
     return <div className="p-8">Invalid link</div>;
   }
