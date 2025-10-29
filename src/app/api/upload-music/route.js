@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { extractYouTubeId, fetchYouTubeMeta } from '@/lib/youtube'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { randomUUID } from 'crypto';
+import { revalidatePath } from "next/cache";
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 export async function POST(req) {
     try {
@@ -26,15 +37,29 @@ export async function POST(req) {
             const arrayBuf = await file.arrayBuffer();
             const buffer = Buffer.from(arrayBuf);
 
+            const bucket = process.env.AWS_S3_BUCKET;
+            const key = `users/${userId}/songs/${randomUUID()}-${file.name}`;
+
+            await s3.send(
+                new PutObjectCommand({
+                    Bucket: bucket,
+                    Key: key,
+                    Body: buffer,
+                    ContentType: file.type,
+                })
+            );
+
             const song = await prisma.song.create({
                 data: {
                     title: file.name,
                     artist: "Unknown Artist",
-                    file: buffer,
+                    // file: buffer,
                     mimeType: file.type,
                     sizeBytes: buffer.byteLength,
                     isUrl: false,
                     users_id: Number(userId),
+                    s3Key: key,
+                    s3Bucket: bucket,
                 },
             });
 
@@ -69,6 +94,8 @@ export async function POST(req) {
                     users_id: Number(userId),
                 },
             })
+
+            revalidatePath("/home/library");
 
             return NextResponse.json({ ok: true, song }, { status: 201 });
         }
