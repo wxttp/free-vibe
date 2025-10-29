@@ -1,5 +1,6 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +18,14 @@ import { publishPlaylist } from "@/lib/playlist/playlist";
 import { encodeId } from "@/lib/ids";
 
 const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
+  const router = useRouter()
+
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddMusic, setOpenAddMusic] = useState(false);
+  const [isPublic, setIsPublic] = useState(playlist?.is_public ?? false)
+  useEffect(() => {
+    setIsPublic(playlist?.is_public ?? false)
+  }, [playlist?.is_public])
 
   const handleEditOpen = () => setOpenEdit(true);
   const handleAddMusicOpen = () => setOpenAddMusic(true);
@@ -47,22 +54,31 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
   };
 
   const handlePublish = async () => {
-    try {
-      const res = await publishPlaylist(playlist.id);
+    toast.promise(
+      (async () => {
+        const res = await publishPlaylist(playlist.id);
 
-      if (res.status === 200)
-        toast.success("Playlist published successfully");
-    } catch (error) {
-      toast.error(error.message);
-    }
+        if (res.status !== 200)
+          throw new Error("failed")
+
+        return res
+      })(),
+      {
+        loading: isPublic ? 'Unpublishing...' : 'Publishing...',
+        success: (res) => {
+          const next = res.playlist?.is_public ?? !isPublic
+          setIsPublic(next)
+          setTimeout(() => router.refresh(), 150)
+          return next ? 'Playlist published successfully' : 'Playlist unpublished successfully'
+        },
+        error: 'Failed to update playlist visibility',
+      }
+    )
   };
 
   const handleCopyLink = async () => {
     try {
       const origin = typeof window !== "undefined" ? window.location.origin : "";
-      // ถ้ามี public_id อยู่แล้วก็ใช้แทน encodeId ได้เลย:
-      // const userPart = playlist.user?.public_id ?? encodeId(playlist.users_id);
-      // const playlistPart = playlist.public_id ?? encodeId(playlist.id);
       const userPart = encodeId(playlist.users_id);
       const playlistPart = encodeId(playlist.id);
       const url = `${origin}/home/playlists/${userPart}/${playlistPart}`;
@@ -105,12 +121,16 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" onSelect={handlePublish}>
             <MonitorUp />
-            Publish this playlist
+            {!isPublic ? "Publish this playlist" : "Unpublish this playlist"}
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onSelect={handleCopyLink}>
-            <ClipboardCopy />
-            Copy Link
-          </DropdownMenuItem>
+          {
+            isPublic ? (
+              <DropdownMenuItem className="cursor-pointer" onSelect={handleCopyLink}>
+                <ClipboardCopy />
+                Copy Link
+              </DropdownMenuItem>
+            ) : ""
+          }
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
