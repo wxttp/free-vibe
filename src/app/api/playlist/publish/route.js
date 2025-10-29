@@ -1,11 +1,13 @@
 import { PrismaClient } from "@/generated/prisma";
 import { NextResponse } from "next/server";
+import { decodeId } from "@/lib/ids";
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
     try {
-        const { id } = await req.json();
+        const { id: encoded } = await req.json();
+        const id = decodeId(encoded);
         if (!id)
             return NextResponse.json({ status: 400 }, { error: "Invalid playlist id" });
 
