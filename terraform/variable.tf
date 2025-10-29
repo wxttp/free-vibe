@@ -14,7 +14,7 @@ variable "default_tag" {
 }
 
 variable "region" {
-  type = string
+  type    = string
   default = "us-east-1"
 }
 
@@ -27,7 +27,7 @@ variable "ec2_instance_type" {
 variable "ec2_ami" {
   description = "AMI ID for EC2 instances"
   type        = string
-  default     = "ami-0c94855ba95c71c99"  # Amazon Linux 2 in us-west-2
+  default     = "ami-0c94855ba95c71c99" # Amazon Linux 2 in us-west-2
 }
 
 
@@ -39,5 +39,5 @@ variable "rds_username" {
 variable "rds_password" {
   description = "RDS master password"
   type        = string
-  sensitive = true
+  sensitive   = true
 }

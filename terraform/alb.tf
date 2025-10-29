@@ -32,21 +32,21 @@ resource "aws_security_group" "alb_sg" {
 
 # ALB (public)
 resource "aws_lb" "app" {
-  name               = "freevibe-alb"
-  internal           = false                     # public
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = module.vpc.public_subnets
+  name                       = "freevibe-alb"
+  internal                   = false # public
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.alb_sg.id]
+  subnets                    = module.vpc.public_subnets
   enable_deletion_protection = false
-  tags               = var.default_tag
+  tags                       = var.default_tag
 }
 
 # Target group for EC2 instances (private subnets)
 resource "aws_lb_target_group" "app_tg" {
-  name     = "freevibe-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = module.vpc.vpc_id
+  name        = "freevibe-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = module.vpc.vpc_id
   target_type = "instance"
   health_check {
     path                = "/"

@@ -32,11 +32,12 @@ resource "aws_security_group" "ec2_sg" {
 
 # EC2 instances in each public subnet
 resource "aws_instance" "app" {
-  count         = length(module.vpc.public_subnets)
-  ami           = var.ec2_ami
-  instance_type = var.ec2_instance_type
-  subnet_id     = module.vpc.public_subnets[count.index]
-  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  count                       = length(module.vpc.public_subnets)
+  ami                         = var.ec2_ami
+  instance_type               = var.ec2_instance_type
+  subnet_id                   = module.vpc.public_subnets[count.index]
+  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
+  associate_public_ip_address = true
 
   tags = merge(var.default_tag, { Name = "FreeVibe-EC2-${count.index}" })
 }
