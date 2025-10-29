@@ -32,10 +32,12 @@ function UrlUploaderCard(props) {
       const data = await res.json();
       if (!res.ok)
         toast.error(data.error || 'Failed to add');
-      else
+      else {
         toast.success('Add successfull!');
         setUrl('');
         router.push("/home/library");
+        router.refresh();
+      }
     } catch {
         toast.error('Network error');
     } finally {
