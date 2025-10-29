@@ -63,6 +63,8 @@ export async function POST(req) {
                 },
             });
 
+            revalidatePath("/home/library");
+
             return NextResponse.json({ ok: true, song }, { status: 201 });
         }
 
