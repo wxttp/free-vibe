@@ -33,12 +33,6 @@ export function AppTopbar() {
       <div className="flex items-center gap-2 justify-between w-full">
         <div className="flex items-center gap-2">
           <SidebarTrigger />
-          <Search className="pointer-events-none absolute top-1/2 left-14 size-4 -translate-y-1/2 opacity-50 select-none" />
-          <SidebarInput
-            id="search"
-            placeholder="Search the songs..."
-            className="pl-8"
-          />
         </div>
 
         <div className="flex gap-2 cursor-pointer mr-5 relative" onClick={() => setOpenDropdown(!openDropdown)}>

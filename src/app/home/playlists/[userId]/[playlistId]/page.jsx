@@ -5,9 +5,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DisplayPlaylist from "@/components/Playlist/DisplayPlaylist";
 import { getAllSongs } from "@/lib/library/song";
+import { decodeId } from "@/lib/ids";
 
 const PlaylistsPage = async ({ params }) => {
-  const { userId, playlistId } = params;
+  const userId = decodeId(params.userId);
+  const playlistId = decodeId(params.playlistId);
+  if (!userId || !playlistId) {
+    return <div className="p-8">Invalid link</div>;
+  }
 
   const playlists = await getPlaylistById(Number(userId), Number(playlistId));
 

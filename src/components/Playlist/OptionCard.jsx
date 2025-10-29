@@ -8,12 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { EllipsisVertical, CirclePlus, MonitorUp, Pencil, Trash } from "lucide-react";
+import { EllipsisVertical, CirclePlus, MonitorUp, Pencil, Trash, ClipboardCopy } from "lucide-react";
 import { deletePlaylist } from "@/lib/playlist/playlist";
 import { toast } from "sonner";
 import { EditPlaylistCard } from "@/components/Playlist/EditPlaylistCard";
 import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylistCard";
 import { publishPlaylist } from "@/lib/playlist/playlist";
+import { encodeId } from "@/lib/ids";
 
 const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
   const [openEdit, setOpenEdit] = useState(false);
@@ -43,27 +44,38 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
         error: (err) => err.message || `Failed to delete playlist`,
       }
     )
-
-    // try {
-    //   const res = await deletePlaylist(playlist.id);
-    //   if (res.status === 200) {
-    //     toast.success("Playlist deleted successfully");
-    //     onDelete(playlist.id);
-    //   }
-    // } catch (error) {
-    //   toast.error(error.message);
-    // }
   };
 
   const handlePublish = async () => {
     try {
       const res = await publishPlaylist(playlist.id);
-      console.log(res);
 
       if (res.status === 200)
         toast.success("Playlist published successfully");
     } catch (error) {
       toast.error(error.message);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      // ถ้ามี public_id อยู่แล้วก็ใช้แทน encodeId ได้เลย:
+      // const userPart = playlist.user?.public_id ?? encodeId(playlist.users_id);
+      // const playlistPart = playlist.public_id ?? encodeId(playlist.id);
+      const userPart = encodeId(playlist.users_id);
+      const playlistPart = encodeId(playlist.id);
+      const url = `${origin}/home/playlists/${userPart}/${playlistPart}`;
+
+      await navigator.clipboard.writeText(url);
+      toast.success("Copied playlist link to clipboard!");
+    } catch (err) {
+      try {
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const url = `${origin}/home/playlists/${encodeId(playlist.users_id)}/${encodeId(playlist.id)}`;
+        window.prompt("Copy this link:", url);
+      } catch (_) {}
+      toast.error("Failed to copy link");
     }
   };
 
@@ -94,6 +106,10 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
           <DropdownMenuItem className="cursor-pointer" onSelect={handlePublish}>
             <MonitorUp />
             Publish this playlist
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" onSelect={handleCopyLink}>
+            <ClipboardCopy />
+            Copy Link
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
