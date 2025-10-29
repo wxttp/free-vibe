@@ -14,18 +14,6 @@ const s3 = new S3Client({
   },
 });
 
-// // helper แปลง Node Readable -> Web Stream
-// function nodeToWeb(readable) {
-//   // SDK v3 บน Node18 ขึ้นไป: readable เป็น Node.js Readable
-//   // ใช้ Readable.toWeb ถ้ามี (Node 18+)
-//   if (typeof ReadableStream === "function" && readable?.pipe) {
-//     // Node >= 18 มี stream/web แล้ว
-//     const { Readable } = require("stream");
-//     return Readable.toWeb(readable);
-//   }
-//   return readable; // fallback (น้อยเคส)
-// }
-
 export async function GET(req, ctx) {
   const { id } = await ctx.params;
   const songId = Number(id || 0);
