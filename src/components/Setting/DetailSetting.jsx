@@ -65,7 +65,7 @@ const DetailSetting = ({ userData }) => {
     }
   };
   return (
-    <Card className="w-full max-w-2xl min-w-sm p-5">
+    <Card className="w-full min-w-sm p-5">
       <form action="">
         <div className="mb-4">
           <Label
@@ -119,7 +119,7 @@ const DetailSetting = ({ userData }) => {
           />
         </div>
       </form>
-      <CardFooter>
+      <CardFooter className={"px-0"}>
         <Button
           type="submit"
           className="w-full bg-[var(--primary-color)] text-white py-2 rounded-md"

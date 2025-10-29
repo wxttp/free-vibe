@@ -15,15 +15,9 @@ import {Button} from '@/components/ui/button';
 import { signOut } from "next-auth/react";
 const SettingCard = ({ userData }) => {
   return (
-    <Tabs defaultValue="profile" className="w-full max-w-2xl min-w-sm p-5">
-      <Card className="w-full max-w-2xl min-w-sm p-5">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold">Setting</CardTitle>
-          <CardDescription className="text-gray-500 space-y-2">
-            Change your detail information or password
-          </CardDescription>
-        </CardHeader>
-        <TabsList className="min-w-lg flex self-center items-center justify-center h-[40px]">
+    <Tabs defaultValue="profile" className="w-full min-w-sm">
+      {/* <Card className="w-full max-w-2xl min-w-sm p-5"> */}
+        <TabsList className="min-w-lg w-full flex self-center items-center justify-center h-[40px]">
           <TabsTrigger value="profile" className="w-fit h-fit">
             Profile
           </TabsTrigger>
@@ -37,8 +31,8 @@ const SettingCard = ({ userData }) => {
         <TabsContent value="password">
           <PasswordSetting userData={userData} />
         </TabsContent>
-        <Button className='bg-red-500 hover:bg-red-600' onClick={()=>signOut()}>Logout</Button>
-      </Card>
+        {/* <Button className='bg-red-500/20 text-red-600/30 border border-red-500/20 hover:text-white hover:bg-red-500 rounded-md transition-colors mt-5' onClick={()=>signOut()}>Logout</Button> */}
+      {/* </Card> */}
     </Tabs>
   );
 };

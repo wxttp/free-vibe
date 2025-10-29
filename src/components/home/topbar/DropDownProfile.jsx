@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import { LogOut } from 'lucide-react';
+
 const DropDownProfile = ({ open, setOpen }) => {
   const dropdownRef = useRef(null);
 
@@ -42,13 +44,14 @@ const DropDownProfile = ({ open, setOpen }) => {
         forceMount
       >
         <DropdownMenuLabel
-          className="cursor-pointer text-red-500"
+          className="cursor-pointer text-red-500 flex items-center gap-2"
           onClick={() =>
             signOut({ callbackUrl: "/" }).then(() =>
               toast.success("Logout successfully")
             )
           }
         >
+          <LogOut className="w-4" />
           Logout
         </DropdownMenuLabel>
       </DropdownMenuContent>
