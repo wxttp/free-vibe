@@ -21,7 +21,7 @@ variable "region" {
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.micro"
+  default     = "t3.small"
 }
 
 variable "ec2_ami" {
@@ -30,6 +30,17 @@ variable "ec2_ami" {
   default     = "ami-0c94855ba95c71c99" # Amazon Linux 2 in us-west-2
 }
 
+variable "ec2_key_name" {
+  description = "Optional EC2 key pair name for SSH access"
+  type        = string
+  default     = "" # empty string if you don’t want SSH key
+}
+
+variable "enable_alb" {
+  description = "Whether to attach ASG to ALB"
+  type        = bool
+  default     = true
+}
 
 variable "rds_username" {
   description = "RDS master username"
@@ -41,3 +52,4 @@ variable "rds_password" {
   type        = string
   sensitive   = true
 }
+

@@ -10,16 +10,16 @@ output "alb_arn" {
   value       = aws_lb.app.arn
 }
 
-# EC2 Private IPs
-output "ec2_private_ips" {
-  description = "Private IP addresses of all EC2 instances"
-  value       = [for instance in aws_instance.app : instance.private_ip]
+# ASG Name
+output "asg_name" {
+  description = "Auto Scaling Group name"
+  value       = aws_autoscaling_group.ec2_asg.name
 }
 
-# EC2 Instance IDs
-output "ec2_instance_ids" {
-  description = "EC2 instance IDs"
-  value       = [for instance in aws_instance.app : instance.id]
+# ASG Desired Capacity
+output "asg_desired_capacity" {
+  description = "Desired capacity of the ASG"
+  value       = aws_autoscaling_group.ec2_asg.desired_capacity
 }
 
 # RDS Endpoint

@@ -28,11 +28,11 @@ resource "aws_security_group" "rds_sg" {
 
 # RDS instance
 resource "aws_db_instance" "postgres" {
-  identifier             = "freevibe-db"
+  identifier             = "freevibe"
   db_name                = "freevibe_db"
   engine                 = data.aws_rds_engine_version.postgres.engine
   engine_version         = data.aws_rds_engine_version.postgres.version
-  instance_class         = "db.t4g.micro" #need to change to t3 on learnerlab
+  instance_class         = "db.t3.small" #need to change to t3 on learnerlab
   allocated_storage      = 20
   username               = var.rds_username
   password               = var.rds_password
