@@ -24,6 +24,7 @@ const DisplayPlaylist = ({ session, playlists, song }) => {
   }, [playlists, load])
 
   const handlePlaylistCreate = (newPlaylist) => {
+    window.location.reload()
     setPlaylistState((prevPlaylists) => [...prevPlaylists, newPlaylist]);
   };
   const handlePlaylistDelete = (playlistId) => {

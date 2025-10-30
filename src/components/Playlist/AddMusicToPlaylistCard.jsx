@@ -22,8 +22,9 @@ export const AddMusicToPlaylistCard = forwardRef(({ onOpen, onClose, onAdd, play
 
   const handleSubmit = async ()=>{
     onAdd(playlistData.id,selectSong);
-    toast.success("Music Added to Playlist Successfully");
     await addSongsToPlaylist(playlistData.id,selectSong);
+    toast.success("Music Added to Playlist Successfully");
+    window.location.reload()
     onClose();
   }
 

@@ -91,7 +91,7 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
         const url = `${origin}/home/playlists/${encodeId(playlist.users_id)}/${encodeId(playlist.id)}`;
         window.prompt("Copy this link:", url);
       } catch (_) {}
-      toast.error("Failed to copy link");
+      toast.info("Copied manually — please paste it yourself!");
     }
   };
 
