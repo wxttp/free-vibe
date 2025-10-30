@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 
 const DetailSetting = ({ userData }) => {
   const [form, setForm] = useState({
-    name: userData.name,
+    name: userData?.name || "",
     email: userData.email,
   });
   const [password,setPassword] = useState("");
