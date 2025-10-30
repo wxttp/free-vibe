@@ -6,9 +6,10 @@ import { usePlayer } from '@/stores/usePlayer'
 import OptionCard from '@/components/home/library/OptionCard'
 import { addToFavorites } from '@/lib/library/song'
 import { toast } from "sonner";
+import { Skeleton } from '@/components/ui/skeleton'
 
 const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
-  const [type, setType] = useState('Loading...')
+  const [type, setType] = useState(null)
   const [isFavorite, setIsFavorite] = useState(song?.isFavorite ?? false);
   const [title, setTitle] = useState(song?.title ?? 'Loading...')
   const [artist, setArtist] = useState(song?.artist ?? 'Loading...')
@@ -50,22 +51,31 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
     }
   }
 
-  const handleAddToFavorites = async () => {
-    try {
-      const res = await addToFavorites(song.id);
+  const handleAddToFavorites = () => {
+    toast.promise(
+      (async () => {
+        const res = await addToFavorites(song.id);
 
-      if (res.status === 201 && res.isExist === false) {
-        toast.success("Song added to favorites");
-        setIsFavorite(true);
+        if (![200, 201].includes(res.status)) {
+          throw new Error("Failed to update favorite");
+        }
+
+        setIsFavorite(!isFavorite);
+        return res;
+      })(),
+      {
+        loading: isFavorite
+          ? "Removing from favorites..."
+          : "Adding to favorites...",
+        success: (res) =>
+          res.status === 201 && res.isExist === false
+            ? "Song added to favorites"
+            : "Song removed from favorites",
+        error: (err) => err.message || "Something went wrong",
       }
-      else if (res.status === 200 && res.isExist === true) {
-        toast.success("Song removed from favorites");
-        setIsFavorite(false);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  }
+    );
+  };
+
 
   return (
     <Card className="relative flex flex-row justify-between items-center min-h-fit p-5">
@@ -82,14 +92,19 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
 
         <div className="flex flex-col space-y-3">
           <CardTitle className="font-extrabold">
-            {title}
+            {type ? title : <Skeleton className="h-6 w-[150px]" />}
           </CardTitle>
-          <CardDescription>{artist}</CardDescription>
+          <CardDescription>{type ? artist : <Skeleton className="h-4 w-[100px]" />}</CardDescription>
 
           <div className="flex space-x-5">
-            <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
-              {type}
-            </div>
+            {type ? (
+              <div className="border-[1.5px] rounded-lg flex justify-center items-center font-medium w-fit px-2">
+                {type}
+              </div>
+              ) : (
+                <Skeleton className="h-6 w-[50px]" />
+              )
+            }
           </div>
         </div>
       </div>
@@ -98,25 +113,19 @@ const MusicCard = ({ isOwner = true, song, onEdit, onPlay, onDelete }) => {
         {
           isOwner && (
           <>
-            {
-              isFavorite ? (
-                <>
-                  <button onClick={handleAddToFavorites}>
-                    <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-                        <Heart className={"fill-[var(--primary-color)]"} />
-                    </div>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button onClick={handleAddToFavorites}>
-                    <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
-                        <HeartPlus />
-                    </div>
-                  </button>
-                </>
-              )
-            }
+            {type ? (
+              <button onClick={handleAddToFavorites}>
+                <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
+                  {isFavorite ? (
+                    <Heart className="fill-[var(--primary-color)]" />
+                  ) : (
+                    <HeartPlus />
+                  )}
+                </div>
+              </button>
+            ) : (
+              <Skeleton className="h-[48px] w-[48px] rounded-md" />
+            )}
             <div className="w-fit hover:bg-[var(--primary-color)] rounded-md px-1 py-1 sm:p-3 hover:text-white transition-all duration-300 cursor-pointer">
               <OptionCard isPlaylist={false} song={song} onEdit={onEdit} onDelete={onDelete} setTitle={setTitle} setArtist={setArtist} />
             </div>

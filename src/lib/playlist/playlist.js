@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { encodeId } from "@/lib/ids";
 
 export async function getAllPlaylists(session) {
   const userId = session?.user?.id;
@@ -104,7 +105,7 @@ export async function publishPlaylist(playlistId) {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      id: playlistId,
+      id: encodeId(playlistId),
     })
   })
   if (!res.ok){

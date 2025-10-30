@@ -8,9 +8,15 @@ const SettingsPage = async () => {
   const session =  await getServerSession(authOptions)
   const userData = await getUserData(session)
   return (
-    <div className='w-full min-w-md flex justify-center items-center h-full'>
-      <SettingCard userData={userData} />
-    </div>
+    <main className='mt-5'>
+      <div className='text-3xl flex flex-col mb-5'>
+        <span className='text-[var(--primary-color)] font-bold'>Setting</span>
+        <span className='text-sm opacity-70'>Change your detail information or password</span>
+      </div>
+      <div className='flex flex-row gap-5 w-full mb-30 sm:mb-5'>
+        <SettingCard userData={userData} />
+      </div>
+    </main>
   )
 }
 

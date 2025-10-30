@@ -1,5 +1,6 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,16 +9,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { EllipsisVertical, CirclePlus, MonitorUp, Pencil, Trash } from "lucide-react";
+import { EllipsisVertical, CirclePlus, MonitorUp, Pencil, Trash, ClipboardCopy } from "lucide-react";
 import { deletePlaylist } from "@/lib/playlist/playlist";
 import { toast } from "sonner";
 import { EditPlaylistCard } from "@/components/Playlist/EditPlaylistCard";
 import { AddMusicToPlaylistCard } from "@/components/Playlist/AddMusicToPlaylistCard";
 import { publishPlaylist } from "@/lib/playlist/playlist";
+import { encodeId } from "@/lib/ids";
 
 const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }) => {
+  const router = useRouter()
+
   const [openEdit, setOpenEdit] = useState(false);
   const [openAddMusic, setOpenAddMusic] = useState(false);
+  const [isPublic, setIsPublic] = useState(playlist?.is_public ?? false)
+  useEffect(() => {
+    setIsPublic(playlist?.is_public ?? false)
+  }, [playlist?.is_public])
 
   const handleEditOpen = () => setOpenEdit(true);
   const handleAddMusicOpen = () => setOpenAddMusic(true);
@@ -27,26 +35,63 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
   };
 
   const handleDelete = async () => {
-    try {
-      const res = await deletePlaylist(playlist.id);
-      if (res.status === 200) {
-        toast.success("Playlist deleted successfully");
-        onDelete(playlist.id);
+    toast.promise(
+      (async () => {
+        const res = await deletePlaylist(playlist.id)
+
+        if (res.status !== 200)
+          throw new Error("Delete failed")
+
+        onDelete(playlist.id)
+        return res
+      })(),
+      {
+        loading: `Deleting playlist...`,
+        success: `Playlist deleted successfully`,
+        error: (err) => err.message || `Failed to delete playlist`,
       }
-    } catch (error) {
-      toast.error(error.message);
-    }
+    )
   };
 
   const handlePublish = async () => {
-    try {
-      const res = await publishPlaylist(playlist.id);
-      console.log(res);
+    toast.promise(
+      (async () => {
+        const res = await publishPlaylist(playlist.id);
 
-      if (res.status === 200)
-        toast.success("Playlist published successfully");
-    } catch (error) {
-      toast.error(error.message);
+        if (res.status !== 200)
+          throw new Error("failed")
+
+        return res
+      })(),
+      {
+        loading: isPublic ? 'Unpublishing...' : 'Publishing...',
+        success: (res) => {
+          const next = res.playlist?.is_public ?? !isPublic
+          setIsPublic(next)
+          setTimeout(() => router.refresh(), 150)
+          return next ? 'Playlist published successfully' : 'Playlist unpublished successfully'
+        },
+        error: 'Failed to update playlist visibility',
+      }
+    )
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const userPart = encodeId(playlist.users_id);
+      const playlistPart = encodeId(playlist.id);
+      const url = `${origin}/home/playlists/${userPart}/${playlistPart}`;
+
+      await navigator.clipboard.writeText(url);
+      toast.success("Copied playlist link to clipboard!");
+    } catch (err) {
+      try {
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const url = `${origin}/home/playlists/${encodeId(playlist.users_id)}/${encodeId(playlist.id)}`;
+        window.prompt("Copy this link:", url);
+      } catch (_) {}
+      toast.error("Failed to copy link");
     }
   };
 
@@ -76,14 +121,22 @@ const OptionCard = ({ playlist, onDelete, onOpen, onClose, onEdit, song, onAdd }
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" onSelect={handlePublish}>
             <MonitorUp />
-            Publish this playlist
+            {!isPublic ? "Publish this playlist" : "Unpublish this playlist"}
           </DropdownMenuItem>
+          {
+            isPublic ? (
+              <DropdownMenuItem className="cursor-pointer" onSelect={handleCopyLink}>
+                <ClipboardCopy />
+                Copy Link
+              </DropdownMenuItem>
+            ) : ""
+          }
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer" onSelect={handleAddMusicOpen}>
             <CirclePlus />
-            Add music to playlist
+            Add / Remove music to playlist
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

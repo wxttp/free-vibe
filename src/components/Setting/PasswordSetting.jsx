@@ -62,7 +62,7 @@ const PasswordSetting = ({ userData }) => {
     }
   };
   return (
-    <Card className="w-full max-w-2xl min-w-sm p-5">
+    <Card className="w-full min-w-sm p-5">
       {/* <CardHeader>
         <CardTitle className="text-2xl font-bold">Setting</CardTitle>
         <CardDescription className="text-gray-500 space-y-2">
@@ -122,7 +122,7 @@ const PasswordSetting = ({ userData }) => {
           />
         </div>
       </form>
-      <CardFooter>
+      <CardFooter className={"px-0"}>
         <Button
           type="submit"
           className="w-full bg-[var(--primary-color)] text-white py-2 rounded-md"

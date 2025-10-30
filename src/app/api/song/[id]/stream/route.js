@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server";
-
 import prisma from "@/lib/prisma";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { Readable } from "node:stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 export async function GET(req, ctx) {
   const { id } = await ctx.params;
@@ -13,16 +22,46 @@ export async function GET(req, ctx) {
 
   const song = await prisma.song.findUnique({
     where: { id: songId },
-    select: { file: true, mimeType: true },
+    // select: { file: true, mimeType: true },
+    select: { s3Bucket: true, s3Key: true, mimeType: true },
   });
+
+  if (!song)
+    return new Response("Not found", { status: 404 });
+
+  const range = req.headers.get("range");
+
+  // ---- สตรีมจาก S3 (ใหม่) ----
+  if (song.s3Bucket && song.s3Key) {
+    try {
+      const resp = await s3.send(new GetObjectCommand({
+        Bucket: song.s3Bucket,
+        Key: song.s3Key,
+        ...(range ? { Range: range } : {}),
+      }));
+
+      const body = Readable.toWeb(resp.Body);
+
+      const headers = new Headers();
+      headers.set("Accept-Ranges", "bytes");
+      headers.set("Content-Type", song.mimeType || resp.ContentType || "audio/mpeg");
+      if (resp.ContentLength != null) headers.set("Content-Length", String(resp.ContentLength));
+      if (resp.ContentRange) headers.set("Content-Range", resp.ContentRange);
+      headers.set("Cache-Control", "no-store");
+
+      return new Response(body, { status: range ? 206 : 200, headers });
+    } catch (err) {
+      console.error("S3 stream error:", err);
+      return new Response("Failed to stream from S3", { status: 500 });
+    }
+  }
+
   if (!song?.file)
     return new Response("Not found", { status: 404 });
 
   const file = Buffer.from(song.file);
   const fileSize = file.length;
   const mime = song.mimeType || "audio/mpeg";
-
-  const range = req.headers.get("range");
 
   // ถ้าไม่มี Range ส่งทั้งไฟล์
   if (!range) {
@@ -109,9 +148,21 @@ export async function DELETE(req, ctx) {
     return NextResponse.json({ status: 400, error: "Bad Request" });
 
   try {
-    await prisma.song.delete({
+    const song = await prisma.song.findUnique({
       where: { id: songId },
+      select: { s3Bucket: true, s3Key: true },
     });
+
+    if (song?.s3Bucket && song?.s3Key) {
+      try {
+        await s3.send(new DeleteObjectCommand({ Bucket: song.s3Bucket, Key: song.s3Key }));
+      } catch (e) {
+        console.warn("Failed to delete S3 object:", e?.message || e);
+      }
+    }
+
+    await prisma.song.delete({ where: { id: songId } });
+
     return NextResponse.json({
       status: 200,
       message: "Song Deleted",
