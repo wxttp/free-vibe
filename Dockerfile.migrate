@@ -1,0 +1,16 @@
+# Dockerfile.migrate
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files to install dependencies
+COPY . .
+
+RUN npm install
+RUN npx prisma generate
+
+# Copy project
+COPY . .
+
+# Command for running migrations
+CMD ["npx", "prisma", "migrate", "deploy"]
