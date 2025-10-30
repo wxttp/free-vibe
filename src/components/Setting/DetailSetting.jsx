@@ -14,10 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const DetailSetting = ({ userData }) => {
-  const [form, setForm] = useState({
-    // name: userData?.name || "",
-    email: userData.email,
-  });
+  const [form, setForm] = useState({email: userData.email});
   const [password,setPassword] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,13 +26,6 @@ const DetailSetting = ({ userData }) => {
   const handleSubmit = async (e) => {
     const payload = {};
     e.preventDefault();
-    // if (form.name !== userData.name) {
-    //   if (form.name.trim() === "") {
-    //     toast.error("Name is required");
-    //     return;
-    //   }
-    //   payload.name = form.name;
-    // }
     if (form.email !== userData.email && form.email.trim() !== "") {
       if (form.email.trim() === "") {
         toast.error("Email is required");
@@ -67,23 +57,6 @@ const DetailSetting = ({ userData }) => {
   return (
     <Card className="w-full min-w-sm p-5">
       <form action="">
-        {/* <div className="mb-4">
-          <Label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Name
-          </Label>
-          <Input
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Enter your name"
-            type="text"
-            id="name"
-            name="name"
-            className="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          />
-        </div> */}
         <div className="mb-4">
           <Label
             htmlFor="email"

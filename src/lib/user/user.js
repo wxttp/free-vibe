@@ -7,6 +7,10 @@ export async function getUserData(session) {
     where: {
       id: user_id,
     },
+    select: {
+      id: true,
+      email: true,
+    }
   });
   if (!userData) {
     throw new Error("User Data Not Found");
@@ -38,7 +42,9 @@ export async function updateUserData(user_id, payload, password) {
       where: {
         id: user_id,
       },
-      data: payload,
+      data: {
+        email: payload.email,
+      },
     });
     if (!updatedUser) {
       throw new Error("User Update Failed");
